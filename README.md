@@ -28,6 +28,8 @@ Make sure the database is migrated.
 npx prisma migrate dev
 ```
 
+Name the migration `initial`
+
 Finally, run the development server:
 
 ```bash

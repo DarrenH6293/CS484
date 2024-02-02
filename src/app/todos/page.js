@@ -54,8 +54,8 @@ export default function ToDos() {
         });
     }
 
-    useEffect(async () => {
-        await fetch("/api/todos", { method: "get" }).then((response) => response.ok && response.json()).then(
+    useEffect(() => {
+        fetch("/api/todos", { method: "get" }).then((response) => response.ok && response.json()).then(
             todos => {
                 todos && setTodos(todos);
                 setIsLoading(false);
