@@ -14,7 +14,13 @@ Then, make sure all your node modules are installs
 npm install
 ```
 
-Next, make sure you modify the .env file to have the correct information for database connection. 
+Next, make sure you modify the .env file to have the correct information for database connection. If you don't have a .env file
+create one in the root of your repo with the following information: 
+
+```
+DATABASE_URL="postgresql://admin:password@localhost:5432/mydb?schema=public"
+NEXTAUTH_SECRET="<some secret here>"
+```
 
 Make sure the database is migrated. 
 
