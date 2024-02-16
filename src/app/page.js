@@ -1,19 +1,35 @@
+'use client'
 import Image from 'next/image'
+import TextField from "@mui/material/TextField";
+import IconButton from '@mui/material/IconButton';
+import SearchIcon from '@mui/icons-material/Search';
+import InputBase from '@mui/material/InputBase';
+import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
+import TuneIcon from '@mui/icons-material/Tune';
 
 export default function Home() {
   return (
     <>
-      <h1>Welcome to CSC 307</h1>
-      <p>
-        This application is a Next.js application. It already contains a way to login and sign-up as well as a rough ToDo list application as a way to demonstrate create and update of a todo. 
-      </p>
-      <h2>Documentation</h2>
-      <ul>
-        <li>NextJS: <a href="https://nextjs.org/docs">https://nextjs.org/docs</a></li>
-        <li>Material UI: <a href="https://mui.com/material-ui/getting-started/">https://mui.com/material-ui/getting-started/</a></li>
-        <li>Prisma: <a href="https://www.prisma.io/docs/getting-started">https://www.prisma.io/docs/getting-started</a></li>
-      </ul>
-      <h2></h2>
+    <Box sx={{backgroundImage: `url('https://images.unsplash.com/photo-1546449982-a01eedcc37c0?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cGFydHklMjBsaWdodHxlbnwwfHwwfHx8MA%3D%3D')`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition:'center',
+              display: 'flex', width: 1, alignContent: 'center', alignItems: 'center', justifyContent: 'center', height: 300, margin: 0, zIndex: 0}}>
+      <Box  sx={{ display: 'flex', alignItems: 'center', alignContent: 'center', justifyContent:"center", borderRadius: 50, borderColor: 'gray', 
+                  borderWidth: 1, borderStyle: 'groove', width: .5, bgcolor: 'white'}}>
+      <InputBase
+        sx={{ ml: 1, flex: 1, justifyContent:'center' }}
+        placeholder="Search for vendors..."
+        inputProps={{ 'aria-label': 'search for vendors'}}
+      />
+        <IconButton aria-label="search">
+          <SearchIcon />
+        </IconButton>
+        <Divider orientation="vertical" flexItem />
+        <IconButton aria-label="filter">
+          <TuneIcon />
+        </IconButton>
+      </Box>
+    </Box>
+
     </>
   )
 }
