@@ -10,17 +10,95 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id  Int @id @default(autoincrement())
-  email String @unique
-  password String 
-  toDos ToDo[]
+enum UserRole {
+  CUSTOMER
+  VENDOR
 }
 
-model ToDo {
-  id Int @id @default(autoincrement())
-  value String
-  done Boolean
-  owner User @relation(fields: [ownerId], references: [id])
-  ownerId Int 
+model User {
+  id            Int            @id @default(autoincrement())
+  role          UserRole
+  displayName   String
+  email         String         @unique
+  password      String
+  phone         String
+  bookings      Booking[]
+  reviews       Review[]
+  notifications Notification[]
+  services      Service[]
+  favorites     Service[]      @relation("userFavorites")
+}
+
+model Booking {
+  id           Int            @id @default(autoincrement())
+  start        DateTime
+  end          DateTime
+  price        Int
+  customer     User           @relation(fields: [customerID], references: [id])
+  customerID   Int
+  service      Service        @relation(fields: [serviceID], references: [id])
+  serviceID    Int
+  notification Notification[]
+}
+
+model Notification {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  dismissed   Boolean
+  start       DateTime @default(now())
+  booking     Booking  @relation(fields: [bookingID], references: [id])
+  bookingID   Int
+  user        User     @relation(fields: [userID], references: [id])
+  userID      Int
+}
+
+model Review {
+  id          Int      @id @default(autoincrement())
+  stars       Int
+  description String
+  date        DateTime @default(now())
+  author      User     @relation(fields: [authorID], references: [id])
+  authorID    Int
+  service     Service  @relation(fields: [serviceID], references: [id])
+  serviceID   Int
+}
+
+model Service {
+  id          Int              @id @default(autoincrement())
+  minPrice    Int
+  maxPrice    Int
+  address     String
+  range       Int
+  vendor      User             @relation(fields: [vendorID], references: [id])
+  vendorID    Int
+  type        Type             @relation(fields: [typeID], references: [id])
+  typeID      Int
+  bookings    Booking[]
+  reviews     Review[]
+  subTypes    SubTypeService[]
+  favoritedBy User[]           @relation("userFavorites")
+}
+
+model Type {
+  id       Int       @id @default(autoincrement())
+  name     String
+  services Service[]
+  subtypes SubType[]
+}
+
+model SubType {
+  id              Int              @id @default(autoincrement())
+  name            String
+  type            Type             @relation(fields: [typeID], references: [id])
+  typeID          Int
+  subTypeServices SubTypeService[]
+}
+
+model SubTypeService {
+  id        Int     @id @default(autoincrement())
+  subType   SubType @relation(fields: [subTypeID], references: [id])
+  subTypeID Int
+  service   Service @relation(fields: [serviceID], references: [id])
+  serviceID Int
 }
