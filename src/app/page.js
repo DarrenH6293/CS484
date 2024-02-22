@@ -70,7 +70,7 @@ export default function Home() {
     <Box sx={{position:'relative', backgroundImage: `url(https://images.unsplash.com/photo-1554228422-b8d4e6b3fa1e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MTd8fHxlbnwwfHx8fHw%3D)`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition:'center',
               display: 'flex', width: 1, alignContent: 'center', alignItems: 'center', justifyContent: 'center', height: 300, margin: 0, zIndex: 0}}>
       <Box  sx={{ display: 'flex', alignItems: 'center', alignContent: 'center', justifyContent:"center", borderRadius: 50, borderColor: 'gray', 
-                  borderWidth: 1, borderStyle: 'groove', width: .5, bgcolor: 'white', overflowY: 'auto', height:.2}}>
+                  borderWidth: 1, borderStyle: 'groove', width: .5, bgcolor: 'white', height:.2}}>
       <InputBase
         sx={{ ml: 1, flex: 1, justifyContent:'center' }}
         placeholder="Search for vendors..."
