@@ -20,6 +20,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { useState } from 'react';
 import Link from 'next/link';
 
+
 const theme = createTheme({});
 
 export default function RootLayout({ children, title }) {
@@ -36,6 +37,11 @@ export default function RootLayout({ children, title }) {
     setAnchorEl(null);
   };
 
+  const handleSignOut = async () => {
+    await signOut({ callbackUrl: '/' });  // Sign out the user first
+  };
+  
+
   if (status === 'authenticated') {
     loginSection = (
       <>
@@ -43,8 +49,19 @@ export default function RootLayout({ children, title }) {
           variant="outlined"
           color="inherit"
           onClick={handleMenuOpen}
+          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
         >
-          My Account
+        <span>My Account</span>
+        <img 
+        src="/images/default_pfp.webp" 
+        style={{ 
+        width: '25px', 
+        height: '25px', 
+        borderRadius: '50%',
+        marginLeft: '8px' // Apply border-radius to make it a circle
+        }} 
+        alt="Profile"
+        />
         </Button>
         <Menu
           anchorEl={anchorEl}
@@ -52,8 +69,7 @@ export default function RootLayout({ children, title }) {
           onClose={handleMenuClose}
         >
           <MenuItem onClick={handleMenuClose}><Link href="/profile">Profile</Link></MenuItem>
-          <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
-          <MenuItem onClick={() => { handleMenuClose(); signOut(); }}>Sign Out</MenuItem>
+          <MenuItem onClick={() => { handleMenuClose(); handleSignOut(); }}>Sign Out</MenuItem>
         </Menu>
       </>
     );
