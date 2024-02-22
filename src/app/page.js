@@ -12,6 +12,9 @@ import ImageListItem from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
+import { Chip, Stack } from '@mui/material';
+import { useState } from 'react';
+
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -44,12 +47,30 @@ const itemData = [
 
 
 export default function Home() {
+  const [tags, setTags] = useState([
+    { key: 'tag1', label: 'Catering', selected: false },
+    { key: 'tag2', label: 'Venue', selected: false },
+    { key: 'tag3', label: 'Entertainment', selected: false },
+    { key: 'tag4', label: 'Production', selected: false },
+    { key: 'tag5', label: 'Decoration', selected: false },
+    // Add more tags as needed
+  ]);
+
+  const handleTagClick = (tagKey) => {
+    const newTags = tags.map(tag => {
+      if (tag.key === tagKey) {
+        return { ...tag, selected: !tag.selected };
+      }
+      return tag;
+    });
+    setTags(newTags);
+  };
   return (
     <>
-    <Box sx={{backgroundImage: `url(https://images.unsplash.com/photo-1546449982-a01eedcc37c0?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cGFydHklMjBsaWdodHxlbnwwfHwwfHx8MA%3D%3D)`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition:'center',
+    <Box sx={{position:'relative', backgroundImage: `url(https://images.unsplash.com/photo-1554228422-b8d4e6b3fa1e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MTd8fHxlbnwwfHx8fHw%3D)`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition:'center',
               display: 'flex', width: 1, alignContent: 'center', alignItems: 'center', justifyContent: 'center', height: 300, margin: 0, zIndex: 0}}>
       <Box  sx={{ display: 'flex', alignItems: 'center', alignContent: 'center', justifyContent:"center", borderRadius: 50, borderColor: 'gray', 
-                  borderWidth: 1, borderStyle: 'groove', width: .5, bgcolor: 'white'}}>
+                  borderWidth: 1, borderStyle: 'groove', width: .5, bgcolor: 'white', height:.2}}>
       <InputBase
         sx={{ ml: 1, flex: 1, justifyContent:'center' }}
         placeholder="Search for vendors..."
@@ -63,7 +84,15 @@ export default function Home() {
           <TuneIcon />
         </IconButton>
       </Box>
+      <Stack direction="row" spacing={1} sx={{ position:'absolute', display: 'flex', alignItems: 'center', alignContent: 'center', justifyContent: 'center', 
+        top: 185, overflowX: 'auto', color: 'white', padding: '10px'}}>
+        {tags.map((tag) => (
+          <Chip key={tag.key} label={<span style={{color:'white'}}>{tag.label}</span>} color='info' onClick={() => handleTagClick(tag.key)}
+              variant={tag.selected ? 'filled' : 'outlined'}/>
+        ))}
+    </Stack>
     </Box>
+
     <ImageList cols={4} gap={10} sx={{ width: 1, height: .5 }}>
       {itemData.map((item) => (
         <ImageListItem key={item.image}>
