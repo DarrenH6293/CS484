@@ -15,22 +15,50 @@ import Signup from './Signup';
 import { useSession } from 'next-auth/react';
 import { Button } from '@mui/material';
 import { signOut } from "next-auth/react"
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import { useState } from 'react';
+import Link from 'next/link';
 
 const theme = createTheme({});
 
 export default function RootLayout({ children, title }) {
-
+  const [anchorEl, setAnchorEl] = useState(null);
   const { data: session, status }  = useSession();
 
   let loginSection;
 
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
   if (status === 'authenticated') {
-    loginSection = <Button variant="outlined" color="inherit" onClick={() => signOut()}>Sign Out</Button>;
+    loginSection = (
+      <>
+        <Button
+          variant="outlined"
+          color="inherit"
+          onClick={handleMenuOpen}
+        >
+          My Account
+        </Button>
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleMenuClose}
+        >
+          <MenuItem onClick={handleMenuClose}><Link href="/profile">Profile</Link></MenuItem>
+          <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
+          <MenuItem onClick={() => { handleMenuClose(); signOut(); }}>Sign Out</MenuItem>
+        </Menu>
+      </>
+    );
   } else {
-    loginSection = <>
-      <Login/>
-      <Signup/>
-    </>;
+    loginSection = <Login />;
   }
 
   return (

@@ -34,6 +34,9 @@ export default function Signup() {
       const signUpData = {};
       signUpData['email'] = data.get('email');
       signUpData['password'] = data.get('password');
+      signUpData['displayName'] = data.get('displayName');
+      signUpData['phone'] = data.get('phone');
+      signUpData['role'] = data.get('role');
       // submit form
       fetch("/api/users", {
         method: 'post',
@@ -67,13 +70,13 @@ export default function Signup() {
 
   return (
     <>
-      <Button variant="outlined" color="inherit" onClick={handleSignupButton}>Signup</Button>
+      <Button variant="outlined" color="inherit" onClick={handleSignupButton}>Sign-Up</Button>
       {open && <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Signup</DialogTitle>
+        <DialogTitle>Sign-Up</DialogTitle>
         <form onSubmit={handleSignup}>
         <DialogContent>
           <DialogContentText>
-            To signup, please fill in your email and create a password.
+            To sign-up, please fill in your email and create a password.
           </DialogContentText>
           { error ? (
             <Alert severity="error">There was an issue signing up, please adjust email and password and try again.</Alert>
@@ -89,6 +92,42 @@ export default function Signup() {
             variant="standard"
             required
             error={formState.email?.error}
+          />
+          <TextField
+            autoFocus
+            margin="dense"
+            id="displayName"
+            name="displayName"
+            label="Display Name"
+            type="displayName"
+            fullWidth
+            variant="standard"
+            required
+            error={formState.displayName?.error}
+          />
+           <TextField
+            autoFocus
+            margin="dense"
+            id="phone"
+            name="phone"
+            label="Phone"
+            type="phone"
+            fullWidth
+            variant="standard"
+            required
+            error={formState.phone?.error}
+          />
+           <TextField
+            autoFocus
+            margin="dense"
+            id="role"
+            name="role"
+            label="Role"
+            type="role"
+            fullWidth
+            variant="standard"
+            required
+            error={formState.role?.error}
           />
           <TextField
             margin="dense"
@@ -113,7 +152,7 @@ export default function Signup() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit">Signup</Button>
+          <Button type="submit">Sign-up</Button>
         </DialogActions>
         </form>
       </Dialog>}
