@@ -12,6 +12,9 @@ import ImageListItem from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
+import { Chip, Stack } from '@mui/material';
+import { useState } from 'react';
+
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -44,6 +47,24 @@ const itemData = [
 
 
 export default function Home() {
+  const [tags, setTags] = useState([
+    { key: 'tag1', label: 'Catering', selected: false },
+    { key: 'tag2', label: 'Venue', selected: false },
+    { key: 'tag3', label: 'Entertainment', selected: false },
+    { key: 'tag4', label: 'Production', selected: false },
+    { key: 'tag5', label: 'Decoration', selected: false },
+    // Add more tags as needed
+  ]);
+
+  const handleTagClick = (tagKey) => {
+    const newTags = tags.map(tag => {
+      if (tag.key === tagKey) {
+        return { ...tag, selected: !tag.selected };
+      }
+      return tag;
+    });
+    setTags(newTags);
+  };
   return (
     <>
     <Box sx={{backgroundImage: `url(https://images.unsplash.com/photo-1546449982-a01eedcc37c0?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cGFydHklMjBsaWdodHxlbnwwfHwwfHx8MA%3D%3D)`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition:'center',
@@ -64,6 +85,14 @@ export default function Home() {
         </IconButton>
       </Box>
     </Box>
+    <Stack direction="row" spacing={1} sx={{ display: 'flex', alignItems: 'center', alignContent: 'center', justifyContent: 'center', 
+        borderStyle: 'groove', borderWidth: 3, marginTop: 2, overflowX: 'auto', borderColor: 'white', color: 'white',padding: '10px',}}>
+        {tags.map((tag) => (
+          <Chip key={tag.key} label={tag.label} onClick={() => handleTagClick(tag.key)}
+              variant={tag.selected ? 'filled' : 'outlined'}/>
+        ))}
+    </Stack>
+
     <ImageList cols={4} gap={10} sx={{ width: 1, height: .5 }}>
       {itemData.map((item) => (
         <ImageListItem key={item.image}>
