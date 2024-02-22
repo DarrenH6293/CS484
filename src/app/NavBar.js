@@ -3,12 +3,14 @@
 import { usePathname } from 'next/navigation'
 import { Box, Button } from '@mui/material';
 import Link from 'next/link';
+import { checkLoggedIn } from "@/lib/auth";
 
 export default function NavBar() {
   const pathname = usePathname();
+  
   const links = [
-    { path: '/', name: 'Home' }, 
-    { path: '/todos', name: 'ToDos' }
+    { path: '/', name: 'Home' },
+    { path: '/todos', name: 'ToDos' },
   ];
 
   return (

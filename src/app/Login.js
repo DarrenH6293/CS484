@@ -9,6 +9,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Alert from '@mui/material/Alert';
+import Signup from './Signup';
 
 import { signIn } from 'next-auth/react';
 
@@ -49,7 +50,24 @@ export default function Login() {
   
   return (
     <>
-      <Button variant="outlined" color="inherit" onClick={handleLoginButton}>Login</Button>
+  <Button 
+    variant="outlined" 
+    color="inherit" 
+    onClick={handleLoginButton} 
+    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+  >
+  <span>Login / Sign-Up</span>
+  <img 
+    src="/images/default_pfp.webp" 
+    style={{ 
+      width: '25px', 
+      height: '25px', 
+      borderRadius: '50%',
+      marginLeft: '8px' // Apply border-radius to make it a circle
+    }} 
+    alt="Profile"
+  />
+</Button>
       {open && <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Login</DialogTitle>
         <DialogContent>
@@ -79,6 +97,9 @@ export default function Login() {
             value={formValues.password}
             onChange={(e) => handleChange({field: 'password', value: e.target.value })}
             variant='standard'/>
+        </DialogContent>
+        <DialogContent>
+          No account? <Signup/>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
