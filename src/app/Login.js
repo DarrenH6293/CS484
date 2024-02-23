@@ -9,14 +9,15 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Alert from '@mui/material/Alert';
+import Signup from './Signup';
 
 import { signIn } from 'next-auth/react';
 
 export default function Login() {
 
-  const [ open, setOpen ] = useState(false);
-  const [ formValues, setFormValues ] = useState({email: '', password: ''});
-  const [ error, setError ] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [formValues, setFormValues] = useState({ email: '', password: '' });
+  const [error, setError] = useState(false);
 
   function handleLoginButton() {
     setOpen(true);
@@ -29,11 +30,11 @@ export default function Login() {
 
   function reset() {
     setError(false);
-    setFormValues({email: '', password: ''});
+    setFormValues({ email: '', password: '' });
   }
 
   function handleSignin() {
-    signIn("normal", {...formValues, redirect: false}).then((result) => {
+    signIn("normal", { ...formValues, redirect: false }).then((result) => {
       if (!result.error) {
         setOpen(false);
         reset();
@@ -43,22 +44,39 @@ export default function Login() {
     })
   }
 
-  function handleChange({field, value}) {
-    setFormValues({...formValues, [field]: value});
+  function handleChange({ field, value }) {
+    setFormValues({ ...formValues, [field]: value });
   }
-  
+
   return (
     <>
-      <Button variant="outlined" color="inherit" onClick={handleLoginButton}>Login</Button>
+      <Button
+        variant="outlined"
+        color="inherit"
+        onClick={handleLoginButton}
+        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+      >
+        <span>Login / Sign-Up</span>
+        <img
+          src="/images/default_pfp.webp"
+          style={{
+            width: '25px',
+            height: '25px',
+            borderRadius: '50%',
+            marginLeft: '8px' // Apply border-radius to make it a circle
+          }}
+          alt="Profile"
+        />
+      </Button>
       {open && <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Login</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            To login, please enter your email address and password. 
+            To login, please enter your email address and password.
           </DialogContentText>
-          { error ? (
+          {error ? (
             <Alert severity="error">There was an issue signing in! Check email and password.</Alert>
-          ) : null }
+          ) : null}
           <TextField
             autoFocus
             margin="dense"
@@ -67,7 +85,7 @@ export default function Login() {
             type="email"
             fullWidth
             value={formValues.email}
-            onChange={(e) => handleChange({field: 'email', value: e.target.value })}
+            onChange={(e) => handleChange({ field: 'email', value: e.target.value })}
             variant="standard"
           />
           <TextField
@@ -77,8 +95,11 @@ export default function Login() {
             type="password"
             fullWidth
             value={formValues.password}
-            onChange={(e) => handleChange({field: 'password', value: e.target.value })}
-            variant='standard'/>
+            onChange={(e) => handleChange({ field: 'password', value: e.target.value })}
+            variant='standard' />
+        </DialogContent>
+        <DialogContent>
+          No account? <Signup />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>

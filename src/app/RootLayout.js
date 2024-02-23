@@ -15,22 +15,66 @@ import Signup from './Signup';
 import { useSession } from 'next-auth/react';
 import { Button } from '@mui/material';
 import { signOut } from "next-auth/react"
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import { useState } from 'react';
+import Link from 'next/link';
+
 
 const theme = createTheme({});
 
 export default function RootLayout({ children, title }) {
-
-  const { data: session, status }  = useSession();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const { data: session, status } = useSession();
 
   let loginSection;
 
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleSignOut = async () => {
+    await signOut({ callbackUrl: '/' });  // Sign out the user first
+  };
+
+
   if (status === 'authenticated') {
-    loginSection = <Button variant="outlined" color="inherit" onClick={() => signOut()}>Sign Out</Button>;
+    loginSection = (
+      <>
+        <Button
+          variant="outlined"
+          color="inherit"
+          onClick={handleMenuOpen}
+          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+        >
+          <span>My Account</span>
+          <img
+            src="/images/default_pfp.webp"
+            style={{
+              width: '25px',
+              height: '25px',
+              borderRadius: '50%',
+              marginLeft: '8px' // Apply border-radius to make it a circle
+            }}
+            alt="Profile"
+          />
+        </Button>
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleMenuClose}
+        >
+          <MenuItem onClick={handleMenuClose}><Link href="/profile">Profile</Link></MenuItem>
+          <MenuItem onClick={() => { handleMenuClose(); handleSignOut(); }}>Sign Out</MenuItem>
+        </Menu>
+      </>
+    );
   } else {
-    loginSection = <>
-      <Login/>
-      <Signup/>
-    </>;
+    loginSection = <Login />;
   }
 
   return (
