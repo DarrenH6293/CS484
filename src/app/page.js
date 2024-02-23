@@ -12,8 +12,11 @@ import ImageListItem from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
-import { Chip, Stack } from '@mui/material';
+import { Chip, Stack, Modal, Typography, FormControl, InputLabel, Select, Button } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import { useState } from 'react';
+
+
 
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -56,6 +59,17 @@ export default function Home() {
     // Add more tags as needed
   ]);
 
+  // Opening filter pop-up
+const [open, setOpen] = useState(false);
+
+const handleOpen = () => {
+  setOpen(true);
+};
+
+const handleClose = () => {
+  setOpen(false);
+};
+
   const handleTagClick = (tagKey) => {
     const newTags = tags.map(tag => {
       if (tag.key === tagKey) {
@@ -80,7 +94,7 @@ export default function Home() {
           <SearchIcon />
         </IconButton>
         <Divider orientation="vertical" flexItem />
-        <IconButton aria-label="filter">
+        <IconButton aria-label="filter" onClick={handleOpen}>
           <TuneIcon />
         </IconButton>
       </Box>
@@ -92,6 +106,81 @@ export default function Home() {
         ))}
     </Stack>
     </Box>
+
+    <Modal // Filter pop-up
+  open={open}
+  onClose={handleClose}
+  aria-labelledby="modal-modal-title"
+  aria-describedby="modal-modal-description"
+>
+  <Box
+    sx={{
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      bgcolor: 'background.paper',
+      boxShadow: 24,
+      p: 4,
+      width: 400,
+      borderRadius: 2.5, // Rounded corners
+    }}
+  >
+    {/* Filter Options */}
+    <Typography variant="h6" gutterBottom>
+      Filter Options
+    </Typography>
+
+    {/* Divider */}
+    <Divider sx={{ my: 2 }} />
+
+    {/* Price */}
+    <FormControl fullWidth sx={{ my: 1 }}>
+      <p>Price</p>
+    </FormControl>
+
+    {/* Divider */}
+    <Divider sx={{ my: 2 }} />
+
+    {/* Tags */}
+    <FormControl fullWidth sx={{ my: 1 }}>
+      <p>Tags</p>
+    </FormControl>
+
+    {/* Divider */}
+    <Divider sx={{ my: 2 }} />
+
+    {/* Location */}
+    <FormControl fullWidth sx={{ my: 1 }}>
+      <p>Location</p>
+    </FormControl>
+
+    {/* Close Button */}
+    <IconButton
+      aria-label="close"
+      onClick={handleClose}
+      sx={{
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        color: 'action.disabled',
+      }}
+    >
+      <CloseIcon />
+    </IconButton>
+
+    {/* Buttons */}
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+      <Button variant="outlined" color="secondary">
+        Clear Filters
+      </Button>
+      <Button variant="contained" color="primary" onClick={handleClose}>
+        Confirm
+      </Button>
+    </Box>
+  </Box>
+</Modal>
+
 
     <ImageList cols={4} gap={10} sx={{ width: 1, height: .5 }}>
       {itemData.map((item) => (
