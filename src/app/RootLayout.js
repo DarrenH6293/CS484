@@ -25,7 +25,7 @@ const theme = createTheme({});
 
 export default function RootLayout({ children, title }) {
   const [anchorEl, setAnchorEl] = useState(null);
-  const { data: session, status }  = useSession();
+  const { data: session, status } = useSession();
 
   let loginSection;
 
@@ -40,7 +40,7 @@ export default function RootLayout({ children, title }) {
   const handleSignOut = async () => {
     await signOut({ callbackUrl: '/' });  // Sign out the user first
   };
-  
+
 
   if (status === 'authenticated') {
     loginSection = (
@@ -51,17 +51,17 @@ export default function RootLayout({ children, title }) {
           onClick={handleMenuOpen}
           style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
         >
-        <span>My Account</span>
-        <img 
-        src="/images/default_pfp.webp" 
-        style={{ 
-        width: '25px', 
-        height: '25px', 
-        borderRadius: '50%',
-        marginLeft: '8px' // Apply border-radius to make it a circle
-        }} 
-        alt="Profile"
-        />
+          <span>My Account</span>
+          <img
+            src="/images/default_pfp.webp"
+            style={{
+              width: '25px',
+              height: '25px',
+              borderRadius: '50%',
+              marginLeft: '8px' // Apply border-radius to make it a circle
+            }}
+            alt="Profile"
+          />
         </Button>
         <Menu
           anchorEl={anchorEl}

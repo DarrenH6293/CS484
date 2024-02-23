@@ -6,8 +6,8 @@ import { getSession } from 'next-auth/react';
 import { checkLoggedIn } from "@/lib/auth";
 
 export async function POST(request) {
-  const data = await request.json();  
-  const { email, password, displayName, phone, role} = data;
+  const data = await request.json();
+  const { email, password, displayName, phone, role } = data;
   console.log('Data:', data); // Log the data object for debugging
   if (email && password && displayName) {
     const hashedPassword = await bcrypt.hash(password, 10);

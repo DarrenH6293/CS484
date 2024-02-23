@@ -7,7 +7,7 @@ import { checkLoggedIn } from "@/lib/auth";
 
 export default function NavBar() {
   const pathname = usePathname();
-  
+
   const links = [
     { path: '/', name: 'Home' },
     { path: '/todos', name: 'ToDos' },
@@ -15,13 +15,13 @@ export default function NavBar() {
 
   return (
     <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-      { links.map(l => {
+      {links.map(l => {
         const isActive = l.path === pathname;
         return (
           <Button component={Link}
-                  href={l.path}
-                  sx={{ my: 2, color: 'white', display: 'block', textDecoration: (isActive ? 'underline' : 'inherit') }}
-                  key={l.path}
+            href={l.path}
+            sx={{ my: 2, color: 'white', display: 'block', textDecoration: (isActive ? 'underline' : 'inherit') }}
+            key={l.path}
           >{l.name}</Button>
         )
       })}

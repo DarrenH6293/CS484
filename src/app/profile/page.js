@@ -14,7 +14,7 @@ export default function Profile() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -51,7 +51,7 @@ export default function Profile() {
     return <p>Loading...</p>;
   }
 
-function handleOpenDialog() {
+  function handleOpenDialog() {
     setOpenDialog(true);
   }
 
@@ -150,38 +150,38 @@ function handleOpenDialog() {
       <h1>My Profile</h1>
       <h2>User Type: {currentUser.role}</h2>
       <div style={{ display: 'grid', gap: '10px', marginBottom: '20px' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'center' }}>
-        <label htmlFor="displayName">Display Name:</label>
-        <input
-          type="text"
-          id="displayName"
-          value={displayName}
-          onChange={(e) => setDisplayName(e.target.value)}
-          style={{ maxWidth: '150px' }}
-        />
+        <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'center' }}>
+          <label htmlFor="displayName">Display Name:</label>
+          <input
+            type="text"
+            id="displayName"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            style={{ maxWidth: '150px' }}
+          />
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'center' }}>
+          <label htmlFor="email">Email:</label>
+          <input
+            type="text"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={{ maxWidth: '150px' }}
+          />
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'center' }}>
+          <label htmlFor="phone">Phone:</label>
+          <input
+            type="text"
+            id="phone"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            style={{ maxWidth: '150px' }}
+          />
+        </div>
+        <button onClick={handleUpdate} style={{ justifySelf: 'start' }}>Update Info</button>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'center' }}>
-        <label htmlFor="email">Email:</label>
-        <input
-          type="text"
-          id="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={{ maxWidth: '150px' }}
-        />
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'center' }}>
-        <label htmlFor="phone">Phone:</label>
-        <input
-          type="text"
-          id="phone"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          style={{ maxWidth: '150px' }}
-        />
-      </div>
-      <button onClick={handleUpdate} style={{ justifySelf: 'start' }}>Update Info</button>
-    </div>
       <Button variant="contained" onClick={handleOpenDialog}>
         Reset Password
       </Button>
