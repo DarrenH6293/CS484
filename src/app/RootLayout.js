@@ -68,8 +68,9 @@ export default function RootLayout({ children, title }) {
           open={Boolean(anchorEl)}
           onClose={handleMenuClose}
         >
-          <MenuItem onClick={handleMenuClose}><Link href="/profile">Profile</Link></MenuItem>
-          <MenuItem onClick={() => { handleMenuClose(); handleSignOut(); }}>Sign Out</MenuItem>
+          <MenuItem onClick={handleMenuClose}><Link href="/profile" style={{color: 'black', textDecoration: 'none'}}>Profile</Link></MenuItem>
+          <MenuItem onClick={handleMenuClose}><Link href="/settings" style={{color: 'black', textDecoration: 'none'}}>Settings</Link></MenuItem>
+          <MenuItem onClick={() => { handleMenuClose(); handleSignOut(); }} style={{color: 'black'}}>Sign Out</MenuItem>
         </Menu>
       </>
     );
