@@ -139,10 +139,6 @@ export default function Profile() {
             // Missing input fields
             setError(true);
         }
-        console.log("Updating user profile...");
-        console.log("New Display Name:", displayName);
-        console.log("New Email:", email);
-        console.log("New Phone:", phone);
     };
 
     return (

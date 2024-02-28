@@ -19,6 +19,7 @@ export default function Profile() {
   const [serviceAddress, setServiceAddress] = useState('');
   const [serviceRange, setServiceRange] = useState('');
   const [services, setServices] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -62,6 +63,7 @@ export default function Profile() {
   }
 
   // Function to add service for vendors
+  // To-do: Add backend
   async function handleAddService() {
     // Perform validation
     if (!serviceName || !serviceDescription || !serviceMinPrice || !serviceMaxPrice || !serviceAddress || !serviceRange) {
@@ -78,6 +80,7 @@ export default function Profile() {
       maxPrice: serviceMaxPrice,
       address: serviceAddress,
       range: serviceRange,
+      image: selectedFile,
     };
 
     setServices(prevServices => [...prevServices, newService]);
@@ -85,13 +88,12 @@ export default function Profile() {
     setOpenDialog(false);
   }
 
+  const handleFileChange = (e) => {
+    setSelectedFile(e.target.files[0]);
+  };
+
   return (
     <>
-      {currentUser.role === 'CUSTOMER' && (
-        <>
-          <h1>My Profile (Customer)</h1>
-        </>
-      )}
       {currentUser.role === 'CUSTOMER' && (
         <>
           <h1>My Profile (Customer)</h1>
@@ -112,7 +114,12 @@ export default function Profile() {
                     cursor: 'pointer',
                   }}
                 >
-                  <img src="/images/placeholder.png" alt="Placeholder" style={{ width: '100%', height: 'auto', marginBottom: '8px' }} />
+                  {/* Check if service has an image, if not, use placeholder */}
+                  {service.image ? (
+                    <img src={URL.createObjectURL(service.image)} alt={service.name} style={{ width: '100%', height: 'auto', marginBottom: '8px' }} />
+                  ) : (
+                    <img src="/images/placeholder.png" alt="Placeholder" style={{ width: '100%', height: 'auto', marginBottom: '8px' }} />
+                  )}
                   <Typography variant="subtitle1" gutterBottom>Name: {service.name}</Typography>
                   <Typography variant="body2" gutterBottom>Description: {service.description}</Typography>
                   <Typography variant="body2" gutterBottom>Min Price: {service.minPrice}</Typography>
@@ -141,6 +148,11 @@ export default function Profile() {
           <Dialog open={openDialog} onClose={handleCloseDialog}>
             <DialogTitle>Add New Service</DialogTitle>
             <DialogContent>
+              <input
+                type="file"
+                accept="images/vendor/*"
+                onChange={handleFileChange}
+              />
               <TextField
                 label="Service Name"
                 value={serviceName}
