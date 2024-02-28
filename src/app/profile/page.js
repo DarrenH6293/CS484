@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { getSession } from 'next-auth/react';
-import { TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
-
+import { Box, TextField, Grid, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 
 export default function Profile() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -11,10 +10,16 @@ export default function Profile() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [serviceName, setServiceName] = useState('');
+  const [serviceDescription, setServiceDescription] = useState('');
+  const [serviceMinPrice, setServiceMinPrice] = useState('');
+  const [serviceMaxPrice, setServiceMaxPrice] = useState('');
+  const [serviceAddress, setServiceAddress] = useState('');
+  const [serviceRange, setServiceRange] = useState('');
+  const [services, setServices] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -33,9 +38,7 @@ export default function Profile() {
         const data = await response.json();
         const user = data.users.find(user => user.email === session.user.email);
         setCurrentUser(user);
-        setDisplayName(user.displayName);
-        setEmail(user.email);
-        setPhone(user.phone);
+        setServices(user.services || []);
       } catch (error) {
         console.error(error);
       } finally {
@@ -59,163 +62,149 @@ export default function Profile() {
     setOpenDialog(false);
   }
 
-  async function handleResetPassword(event) {
-    event.preventDefault();
-
-    // Validate input fields
-    if (newPassword && (newPassword === confirmPassword)) {
-      const resetPasswordData = {
-        email: currentUser.email,
-        password: newPassword,
-      };
-
-      try {
-        const response = await fetch("/api/users", {
-          method: 'POST',
-          body: JSON.stringify(resetPasswordData),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (response.ok) {
-          // Password reset successfully
-          alert('Password reset successfully');
-          setNewPassword('');
-          setConfirmPassword('');
-          handleCloseDialog();
-        } else {
-          // Password reset failed
-          setError(true);
-          alert('Failed to reset password');
-        }
-      } catch (error) {
-        console.error('Error resetting password:', error);
-        setError(true);
-      }
-    } else {
-      // Missing input fields or passwords don't match
+  // Function to add service for vendors
+  // To-do: Add backend
+  async function handleAddService() {
+    // Perform validation
+    if (!serviceName || !serviceDescription || !serviceMinPrice || !serviceMaxPrice || !serviceAddress || !serviceRange) {
       setError(true);
+      return;
     }
+
+    setError(false);
+
+    const newService = {
+      name: serviceName,
+      description: serviceDescription,
+      minPrice: serviceMinPrice,
+      maxPrice: serviceMaxPrice,
+      address: serviceAddress,
+      range: serviceRange,
+      image: selectedFile,
+    };
+
+    setServices(prevServices => [...prevServices, newService]);
+
+    setOpenDialog(false);
   }
 
-  async function handleUpdate(event) {
-    event.preventDefault();
-
-    // Validate input fields
-    if (email && displayName && phone) {
-      const updateUserData = {
-        email: email,
-        displayName: displayName,
-        phone: phone
-      };
-
-      try {
-        const response = await fetch("/api/users", {
-          method: 'POST',
-          body: JSON.stringify(updateUserData),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (response.ok) {
-          // Profile updated successfully
-          alert('Profile updated successfully');
-          handleCloseDialog();
-          setDisplayName(updateUserData.displayName);
-          setEmail(updateUserData.email);
-          setPhone(updateUserData.phone);
-        } else {
-          // Profile update failed
-          setError(true);
-          alert('Failed to update profile');
-        }
-      } catch (error) {
-        console.error('Error updating profile:', error);
-        setError(true);
-      }
-    } else {
-      // Missing input fields
-      setError(true);
-    }
-    console.log("Updating user profile...");
-    console.log("New Display Name:", displayName);
-    console.log("New Email:", email);
-    console.log("New Phone:", phone);
+  const handleFileChange = (e) => {
+    setSelectedFile(e.target.files[0]);
   };
 
   return (
     <>
-      <h1>My Profile</h1>
-      <h2>User Type: {currentUser.role}</h2>
-      <div style={{ display: 'grid', gap: '10px', marginBottom: '20px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'center' }}>
-          <label htmlFor="displayName">Display Name:</label>
-          <input
-            type="text"
-            id="displayName"
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            style={{ maxWidth: '150px' }}
-          />
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'center' }}>
-          <label htmlFor="email">Email:</label>
-          <input
-            type="text"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={{ maxWidth: '150px' }}
-          />
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'center' }}>
-          <label htmlFor="phone">Phone:</label>
-          <input
-            type="text"
-            id="phone"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            style={{ maxWidth: '150px' }}
-          />
-        </div>
-        <button onClick={handleUpdate} style={{ justifySelf: 'start' }}>Update Info</button>
-      </div>
-      <Button variant="contained" onClick={handleOpenDialog}>
-        Reset Password
-      </Button>
-      <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>Reset Password</DialogTitle>
-        <form onSubmit={handleResetPassword}>
-          <DialogContent>
-            <TextField
-              label="New Password"
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              fullWidth
-              margin="normal"
-              required
-            />
-            <TextField
-              label="Confirm New Password"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              fullWidth
-              margin="normal"
-              required
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog}>Cancel</Button>
-            <Button type="submit" variant="contained">
-              Reset Password
-            </Button>
-          </DialogActions>
-        </form>
-      </Dialog>
+      {currentUser.role === 'CUSTOMER' && (
+        <>
+          <h1>My Profile (Customer)</h1>
+        </>
+      )}
+      {currentUser.role === 'VENDOR' && (
+        <>
+          <h1>My Profile (Vendor)</h1>
+          <h2>My Services</h2>
+          <Grid container spacing={3} sx={{ maxWidth: '900px', margin: '0' }}>
+            {services.map((service, index) => (
+              <Grid item xs={12} sm={6} md={4} key={index}>
+                <Box
+                  sx={{
+                    border: '1px solid #ccc',
+                    borderRadius: '8px',
+                    padding: '16px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {/* Check if service has an image, if not, use placeholder */}
+                  {service.image ? (
+                    <img src={URL.createObjectURL(service.image)} alt={service.name} style={{ width: '100%', height: 'auto', marginBottom: '8px' }} />
+                  ) : (
+                    <img src="/images/placeholder.png" alt="Placeholder" style={{ width: '100%', height: 'auto', marginBottom: '8px' }} />
+                  )}
+                  <Typography variant="subtitle1" gutterBottom>Name: {service.name}</Typography>
+                  <Typography variant="body2" gutterBottom>Description: {service.description}</Typography>
+                  <Typography variant="body2" gutterBottom>Min Price: {service.minPrice}</Typography>
+                  <Typography variant="body2" gutterBottom>Max Price: {service.maxPrice}</Typography>
+                  <Typography variant="body2" gutterBottom>Address: {service.address}</Typography>
+                  <Typography variant="body2" gutterBottom>Range: {service.range}</Typography>
+                </Box>
+              </Grid>
+            ))}
+            <Grid item xs={12} sm={6} md={4}>
+              <Box
+                sx={{
+                  border: '1px solid #ccc',
+                  borderRadius: '8px',
+                  padding: '16px',
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                }}
+                onClick={handleOpenDialog}
+              >
+                <img src="/images/placeholder.png" alt="Placeholder" style={{ width: '100%', height: 'auto', aspectRatio: '4 / 3', objectFit: 'contain', marginBottom: '8px' }} />
+                <Typography variant="subtitle1" gutterBottom>Click to add a service</Typography>
+              </Box>
+            </Grid>
+          </Grid>
+          <Dialog open={openDialog} onClose={handleCloseDialog}>
+            <DialogTitle>Add New Service</DialogTitle>
+            <DialogContent>
+              <input
+                type="file"
+                accept="images/vendor/*"
+                onChange={handleFileChange}
+              />
+              <TextField
+                label="Service Name"
+                value={serviceName}
+                onChange={e => setServiceName(e.target.value)}
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                label="Description"
+                value={serviceDescription}
+                onChange={e => setServiceDescription(e.target.value)}
+                fullWidth
+                margin="normal"
+                multiline
+                rows={4}
+              />
+              <TextField
+                label="Minimum Price"
+                value={serviceMinPrice}
+                onChange={e => setServiceMinPrice(e.target.value)}
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                label="Maximum Price"
+                value={serviceMaxPrice}
+                onChange={e => setServiceMaxPrice(e.target.value)}
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                label="Address"
+                value={serviceAddress}
+                onChange={e => setServiceAddress(e.target.value)}
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                label="Range"
+                value={serviceRange}
+                onChange={e => setServiceRange(e.target.value)}
+                fullWidth
+                margin="normal"
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseDialog}>Cancel</Button>
+              <Button onClick={handleAddService} color="primary">Add</Button>
+            </DialogActions>
+          </Dialog>
+        </>
+      )}
     </>
   );
 }
