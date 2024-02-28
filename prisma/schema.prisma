@@ -71,6 +71,7 @@ model Service {
   address     String
   range       Int
   description String
+  name        String
   vendor      User             @relation(fields: [vendorID], references: [id])
   vendorID    Int
   type        Type             @relation(fields: [typeID], references: [id])
