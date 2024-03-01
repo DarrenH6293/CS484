@@ -36,6 +36,7 @@ export default function Home() {
     // Add more tags as needed
   ]);
   const [services, setServices] = useState([]);
+  const [selectedTypes, setSelectedTypes] = useState([]);
 
   useEffect(() => {
     async function fetchServices() {
@@ -54,6 +55,14 @@ export default function Home() {
 
     fetchServices();
   }, []);
+
+  const filterServices = () => {
+    let filteredServices = services;
+    if (selectedTypes.length > 0) {
+      filteredServices = filteredServices.filter(service => selectedTypes.includes(service.type.name));
+    }
+    return filteredServices;
+  };
 
 
   // Opening filter pop-up
@@ -75,7 +84,10 @@ export default function Home() {
       return tag;
     });
     setTags(newTags);
+    const selectedTypes = newTags.filter(tag => tag.selected).map(tag => tag.label);
+    setSelectedTypes(selectedTypes);
   };
+
   return (
     <>
       <Box sx={{
@@ -186,18 +198,18 @@ export default function Home() {
 
 
       <ImageList cols={4} gap={10} sx={{ width: .75, height: 0.5, borderRadius: '10px' }}>
-        {services.map((service) => (
+        {filterServices().map((service) => (
           <ImageListItem key={service.id}>
             <img
-                      src="/images/placeholder.png"
-                      alt="Placeholder"
-                      style={{
-                        width: "100%",
-                        height: "auto",
-                        marginBottom: "8px",
-                        borderRadius: '10px'
-                      }}
-                    />
+              src="/images/placeholder.png"
+              alt="Placeholder"
+              style={{
+                width: "100%",
+                height: "auto",
+                marginBottom: "8px",
+                borderRadius: '10px'
+              }}
+            />
             <ImageListItemBar
               sx={{ backgroundColor: '#F0F0F0', borderRadius: '5px 5px 5px 5px' }}
               title={<span style={{ padding: 5, textAlign: 'center' }}><b>{service.name}</b></span>}
