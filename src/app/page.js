@@ -12,7 +12,7 @@ import ImageListItem from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
-import { Chip, Stack, Modal, Typography, FormControl, InputLabel, Select, Button } from '@mui/material';
+import { Chip, Stack, Modal, Typography, FormControl, InputLabel, Select, Button, FormGroup, FormControlLabel, Checkbox } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useState, useEffect } from 'react';
 import { NextResponse } from 'next/server';
@@ -88,6 +88,14 @@ export default function Home() {
     setSelectedTypes(selectedTypes);
   };
 
+  const handleClearFilters = () => {
+    // Reset all tags to unselected
+    const resetTags = tags.map(tag => ({ ...tag, selected: false }));
+    setTags(resetTags);
+    // Reset selected types
+    setSelectedTypes([]);
+  };
+
   return (
     <>
       <Box sx={{
@@ -122,7 +130,8 @@ export default function Home() {
         </Stack>
       </Box>
 
-      <Modal // Filter pop-up
+      {/* Filter pop-up */}
+      <Modal
         open={open}
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
@@ -149,17 +158,33 @@ export default function Home() {
           {/* Divider */}
           <Divider sx={{ my: 2 }} />
 
-          {/* Price */}
+          {/* Tags */}
           <FormControl fullWidth sx={{ my: 1 }}>
-            <p>Price</p>
+            <Typography variant="subtitle1" gutterBottom>
+              Tags
+            </Typography>
+            <FormGroup>
+              {tags.map((tag) => (
+                <FormControlLabel
+                  key={tag.key}
+                  control={
+                    <Checkbox
+                      checked={tag.selected}
+                      onChange={() => handleTagClick(tag.key)}
+                    />
+                  }
+                  label={tag.label}
+                />
+              ))}
+            </FormGroup>
           </FormControl>
 
           {/* Divider */}
-          <Divider sx={{ my: 2 }} />
+          <Divider sx={{ my: 1 }} />
 
-          {/* Tags */}
-          <FormControl fullWidth sx={{ my: 1 }}>
-            <p>Tags</p>
+           {/* Price */}
+           <FormControl fullWidth sx={{ my: 1 }}>
+            <p>Price</p>
           </FormControl>
 
           {/* Divider */}
@@ -186,7 +211,7 @@ export default function Home() {
 
           {/* Buttons */}
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
-            <Button variant="outlined" color="secondary">
+            <Button variant="outlined" color="secondary" onClick={handleClearFilters}>
               Clear Filters
             </Button>
             <Button variant="contained" color="primary" onClick={handleClose}>
