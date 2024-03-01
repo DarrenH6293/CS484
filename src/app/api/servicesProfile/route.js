@@ -6,7 +6,11 @@ import { getSession } from "next-auth/react";
 import { checkLoggedIn } from "@/lib/auth";
 export async function GET() {
   try {
-    const services = await prisma.service.findMany();
+    const services = await prisma.service.findMany({
+      include: {
+        type: true // Include the related type object
+      }
+    });
     return NextResponse.json({ services });
   } catch (error) {
     return NextResponse.json(

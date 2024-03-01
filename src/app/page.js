@@ -185,7 +185,7 @@ export default function Home() {
       </Modal>
 
 
-      <ImageList cols={4} gap={10} sx={{ width: .75, height: 0.5 }}>
+      <ImageList cols={4} gap={10} sx={{ width: .75, height: 0.5, borderRadius: '10px' }}>
         {services.map((service) => (
           <ImageListItem key={service.id}>
             <img
@@ -195,14 +195,16 @@ export default function Home() {
                         width: "100%",
                         height: "auto",
                         marginBottom: "8px",
+                        borderRadius: '10px'
                       }}
                     />
             <ImageListItemBar
-              sx={{ backgroundColor: '#F0F0F0' }}
-              title={<span style={{ padding: 1, textAlign: 'center' }}><b>{service.name}</b></span>}
+              sx={{ backgroundColor: '#F0F0F0', borderRadius: '5px 5px 5px 5px' }}
+              title={<span style={{ padding: 5, textAlign: 'center' }}><b>{service.name}</b></span>}
               subtitle={<div>
-                <span style={{ color: 'green', textAlign: 'center' }}><b>Price:</b> ${service.minPrice} - ${service.maxPrice}</span><br />
-                <span><b>Location:</b> {service.address}</span>
+                <span style={{ textAlign: 'center', padding: 5 }}><b>Type:</b> {service.type.name}</span><br />
+                <span style={{ textAlign: 'center', padding: 5 }}><b>Price:</b> ${service.minPrice} - ${service.maxPrice}</span><br />
+                <span style={{ padding: 5, textAlign: 'center' }}><b>Location:</b> {service.address}</span>
               </div>}
               position="below"
             />
