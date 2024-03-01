@@ -145,6 +145,7 @@ export default function Profile() {
                     border: "1px solid #ccc",
                     borderRadius: "8px",
                     padding: "16px",
+                    position: "relative",
                     cursor: "pointer",
                   }}
                 >
@@ -188,6 +189,19 @@ export default function Profile() {
                   <Typography variant="body2" gutterBottom>
                     Range: {service.range}
                   </Typography>
+                  {/* Edit button */}
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    sx={{
+                      position: "absolute",
+                      bottom: "8px", // Adjust this value for vertical positioning
+                      right: "8px", // Adjust this value for horizontal positioning
+                    }}
+                    onClick={() => handleEditService(service)} // Pass the service data to the edit function
+                  >
+                    Edit
+                  </Button>
                 </Box>
               </Grid>
             ))}
