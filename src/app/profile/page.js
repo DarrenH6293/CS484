@@ -137,14 +137,15 @@ export default function Profile() {
         <>
           <h1>My Profile (Vendor)</h1>
           <h2>My Services</h2>
-          <Grid container spacing={3} sx={{ maxWidth: "900px", margin: "0" }}>
+          <Grid container spacing={3} sx={{ maxWidth: "1400px", margin: "0" }}>
             {services.map((service, index) => (
-              <Grid item xs={12} sm={6} md={4} key={index}>
+              <Grid item xs="auto" sm="auto" md={3} key={index}>
                 <Box
                   sx={{
                     border: "1px solid #ccc",
                     borderRadius: "8px",
                     padding: "16px",
+                    position: "relative",
                     cursor: "pointer",
                   }}
                 >
@@ -188,10 +189,23 @@ export default function Profile() {
                   <Typography variant="body2" gutterBottom>
                     Range: {service.range}
                   </Typography>
+                  {/* Edit button */}
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    sx={{
+                      position: "absolute",
+                      bottom: "8px", // Adjust this value for vertical positioning
+                      right: "8px", // Adjust this value for horizontal positioning
+                    }}
+                    onClick={() => handleEditService(service)} // Pass the service data to the edit function
+                  >
+                    Edit
+                  </Button>
                 </Box>
               </Grid>
             ))}
-            <Grid item xs={12} sm={6} md={4}>
+            <Grid item xs={12} sm="auto" md={3}>
               <Box
                 sx={{
                   border: "1px solid #ccc",
@@ -222,11 +236,13 @@ export default function Profile() {
           <Dialog open={openDialog} onClose={handleCloseDialog}>
             <DialogTitle>Add New Service</DialogTitle>
             <DialogContent>
+              Add a service image<br></ br>
               <input
                 type="file"
-                accept="images/vendor/*"
+                accept="image/jpeg, image/png, image/gif"
                 onChange={handleFileChange}
               />
+              <br></ br>
               <TextField
                 label="Service Name"
                 value={serviceName}
