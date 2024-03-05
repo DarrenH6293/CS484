@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  MenuItem,
+  MenuItem
 } from "@mui/material";
 
 export default function Profile() {
@@ -297,6 +297,9 @@ export default function Profile() {
               >
                 <MenuItem value={1}>Venue</MenuItem>
                 <MenuItem value={2}>Entertainment</MenuItem>
+                <MenuItem value={3}>Catering</MenuItem>
+                <MenuItem value={4}>Production</MenuItem>
+                <MenuItem value={5}>Decoration</MenuItem>
               </TextField>
             </DialogContent>
             <DialogActions>

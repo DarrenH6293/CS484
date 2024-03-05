@@ -12,6 +12,7 @@ import ImageListItem from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
+import Slider from '@mui/material/Slider';
 import { Chip, Stack, Modal, Typography, FormControl, InputLabel, Select, Button, FormGroup, FormControlLabel, Checkbox } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useState, useEffect } from 'react';
@@ -28,15 +29,16 @@ const Item = styled(Paper)(({ theme }) => ({
 
 export default function Home() {
   const [tags, setTags] = useState([
-    { key: 'tag1', label: 'Catering', selected: false },
-    { key: 'tag2', label: 'Venue', selected: false },
-    { key: 'tag3', label: 'Entertainment', selected: false },
+    { key: 'tag1', label: 'Venue', selected: false },
+    { key: 'tag2', label: 'Entertainment', selected: false },
+    { key: 'tag3', label: 'Catering', selected: false },
     { key: 'tag4', label: 'Production', selected: false },
     { key: 'tag5', label: 'Decoration', selected: false },
     // Add more tags as needed
   ]);
   const [services, setServices] = useState([]);
   const [selectedTypes, setSelectedTypes] = useState([]);
+
 
   useEffect(() => {
     async function fetchServices() {
@@ -64,6 +66,12 @@ export default function Home() {
     return filteredServices;
   };
 
+  // Price Slider
+  const [price, setPrice] = useState([0,10000]);
+
+  const handlePrice = (event, p) => {
+    setPrice(p);
+  }
 
   // Opening filter pop-up
   const [open, setOpen] = useState(false);
@@ -185,6 +193,15 @@ export default function Home() {
            {/* Price */}
            <FormControl fullWidth sx={{ my: 1 }}>
             <p>Price</p>
+            <Slider
+              name='price'
+              value={price}
+              onChange={handlePrice}
+              valueLabelDisplay="auto"
+              min={0}
+              max={10000}
+              step={10}
+            />
           </FormControl>
 
           {/* Divider */}

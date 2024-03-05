@@ -1,5 +1,11 @@
 'use client'
 
+import * as React from 'react';
+import Box from '@mui/material/Box';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 import { useState } from 'react';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -25,6 +31,12 @@ export default function Signup() {
     setOpen(false);
   }
 
+  const [role, setRole] = React.useState('');
+
+  const handleRole = (event) => {
+    setRole(event.target.value);
+  };
+
   function handleSignup(event) {
     event.preventDefault();
     let valid = event.currentTarget.reportValidity();
@@ -36,7 +48,7 @@ export default function Signup() {
       signUpData['password'] = data.get('password');
       signUpData['displayName'] = data.get('displayName');
       signUpData['phone'] = data.get('phone');
-      signUpData['role'] = data.get('role');
+      signUpData['role'] = data.get('role');    
       // submit form
       fetch("/api/users", {
         method: 'post',
@@ -57,7 +69,7 @@ export default function Signup() {
         }
       })
     } else {
-      setFormState({ ...formState, passwordConfirmation: { error: true, message: "You're passwords don't match." } })
+      setFormState({ ...formState, passwordConfirmation: { error: true, message: "Your passwords don't match." } })
     }
     return false;
   }
@@ -118,17 +130,21 @@ export default function Signup() {
               error={formState.phone?.error}
             />
             <TextField
-              autoFocus
+              select
+              label='Role'
               margin="dense"
               id="role"
               name="role"
-              label="Role"
               type="role"
               fullWidth
+              value={role}
               variant="standard"
               required
               error={formState.role?.error}
-            />
+              onChange={handleRole}>
+              <MenuItem value={'VENDOR'}>Vendor</MenuItem>
+              <MenuItem value={'CUSTOMER'}>Customer</MenuItem>
+            </TextField>
             <TextField
               margin="dense"
               id="password"
