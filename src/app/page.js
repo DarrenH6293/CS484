@@ -11,7 +11,10 @@ import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
 import { styled } from '@mui/material/styles';
+import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
+import MinimizeIcon from '@mui/icons-material/Minimize';
 import Paper from '@mui/material/Paper';
+import InputAdornment from '@mui/material/InputAdornment';
 import { Chip, Stack, Modal, Typography, FormControl, InputLabel, Select, Button, FormGroup, FormControlLabel, Checkbox } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useState, useEffect } from 'react';
@@ -28,16 +31,18 @@ const Item = styled(Paper)(({ theme }) => ({
 
 export default function Home() {
   const [tags, setTags] = useState([
-    { key: 'tag1', label: 'Catering', selected: false },
-    { key: 'tag2', label: 'Venue', selected: false },
-    { key: 'tag3', label: 'Entertainment', selected: false },
+    { key: 'tag1', label: 'Venue', selected: false },
+    { key: 'tag2', label: 'Entertainment', selected: false },
+    { key: 'tag3', label: 'Catering', selected: false },
     { key: 'tag4', label: 'Production', selected: false },
     { key: 'tag5', label: 'Decoration', selected: false },
     // Add more tags as needed
   ]);
   const [services, setServices] = useState([]);
   const [selectedTypes, setSelectedTypes] = useState([]);
-
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(10000);
+  
   useEffect(() => {
     async function fetchServices() {
       try {
@@ -61,6 +66,7 @@ export default function Home() {
     if (selectedTypes.length > 0) {
       filteredServices = filteredServices.filter(service => selectedTypes.includes(service.type.name));
     }
+    filteredServices = filteredServices.filter(service => (service.minPrice >= minPrice && service.maxPrice <= maxPrice));
     return filteredServices;
   };
 
@@ -185,6 +191,29 @@ export default function Home() {
            {/* Price */}
            <FormControl fullWidth sx={{ my: 1 }}>
             <p>Price</p>
+            <Box>
+              <TextField
+                InputProps={{startAdornment: <InputAdornment position="start">$</InputAdornment>}}
+                label='Minimum Price'
+                placeholder='0'
+                value={minPrice}
+                style = {{width: 120}}
+                name="minPrice"
+                onChange={(e) => setMinPrice(e.target.value)}
+              >
+              </TextField> 
+              <MinimizeIcon></MinimizeIcon>
+              <TextField
+                InputProps={{ startAdornment: <InputAdornment position="start">$</InputAdornment>}}
+                autoWidth
+                label="Maximum Price"
+                value={maxPrice}
+                placeholder='100'
+                style = {{width: 120}}
+                onChange={(e) => setMaxPrice(e.target.value)}
+                name="maxPirce">
+              </TextField>
+            </Box>
           </FormControl>
 
           {/* Divider */}
@@ -222,7 +251,7 @@ export default function Home() {
       </Modal>
 
 
-      <ImageList cols={4} gap={10} sx={{ width: .75, height: 0.5, borderRadius: '10px' }}>
+      <ImageList id='services'cols={4} gap={10} sx={{ width: .75, height: 0.5, borderRadius: '10px' }}>
         {filterServices().map((service) => (
           <ImageListItem key={service.id}>
             <img
