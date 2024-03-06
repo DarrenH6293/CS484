@@ -251,7 +251,7 @@ export default function Home() {
       </Modal>
 
 
-      <ImageList id='services'cols={4} gap={10} sx={{ width: .75, height: 0.5, borderRadius: '10px' }}>
+      <ImageList id='services' cols={4} gap={10} sx={{width: 1, height: 0.5, borderRadius: '10px' }}>
         {filterServices().map((service) => (
           <ImageListItem key={service.id}>
             <img

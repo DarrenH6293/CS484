@@ -42,7 +42,153 @@ async function main() {
     },
   })
 
-  console.log({ Venue, Entertainment, Catering, Production, Decoration})
+  const Bob = await prisma.user.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+        role: "VENDOR",
+        displayName: "Bob Joe",
+        email: "bobjoe@mail.com",
+        password: 'bobjoe',
+        phone: '1231234321'
+    },
+  })
+
+  const Jane = await prisma.user.upsert({
+    where: { id: 2 },
+    update: {},
+    create: {
+        role: "CUSTOMER",
+        displayName: "Jane Joe",
+        email: "janedoe@mail.com",
+        password: 'janedoe',
+        phone: '3234567890'
+    },
+  })
+
+  const Ben = await prisma.user.upsert({
+    where: { id: 3 },
+    update: {},
+    create: {
+        role: "VENDOR",
+        displayName: "Ben",
+        email: "benten@mail.com",
+        password: 'benten',
+        phone: '1020309293'
+    },
+  })
+
+  const Abby = await prisma.user.upsert({
+    where: { id: 4 },
+    update: {},
+    create: {
+        role: "VENDOR",
+        displayName: "Abby",
+        email: "abby@mail.com",
+        password: 'abby',
+        phone: '2232233344'
+    },
+  })
+
+  const Carl = await prisma.user.upsert({
+    where: { id: 5 },
+    update: {},
+    create: {
+        role: "VENDOR",
+        displayName: "Carl",
+        email: "carljr@mail.com",
+        password: 'carljr',
+        phone: '4204204201'
+    },
+  })
+
+  const Hank = await prisma.user.upsert({
+    where: { id: 6 },
+    update: {},
+    create: {
+        role: "VENDOR",
+        displayName: "Hank",
+        email: "hankgreen@mail.com",
+        password: 'hankgreen',
+        phone: '6904293029'
+    },
+  })
+
+  const Food = await prisma.service.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+        minPrice: 100,
+        maxPrice: 1000,
+        address: '1 Grand Ave',
+        range: 0,
+        name: "Bob's Tacos",
+        description: 'I sell tacos.',
+        vendor: {connect: Bob},
+        type: {connect: Catering}
+    },
+  })
+
+  const Ranch = await prisma.service.upsert({
+    where: { id: 2 },
+    update: {},
+    create: {
+        minPrice: 300,
+        maxPrice: 2000,
+        address: '1 Boardwalk Ave',
+        range: 0,
+        name: "Fancy Ranch",
+        description: 'Fancy Venue for Events.',
+        vendor: {connect: Ben},
+        type: {connect: Venue}
+    },
+  })
+
+  const Party = await prisma.service.upsert({
+    where: { id: 3 },
+    update: {},
+    create: {
+        minPrice: 100,
+        maxPrice: 500,
+        address: '345 Jersey Ave',
+        range: 0,
+        name: "Party Supplies",
+        description: 'We have party supplies for Events.',
+        vendor: {connect: Ben},
+        type: {connect: Decoration}
+    },
+  })
+
+  const Band = await prisma.service.upsert({
+    where: { id: 4 },
+    update: {},
+    create: {
+        minPrice: 200,
+        maxPrice: 750,
+        address: '345 New York Ave',
+        range: 50,
+        name: "Cool Band",
+        description: 'We play cool music.',
+        vendor: {connect: Carl},
+        type: {connect: Entertainment}
+    },
+  })
+
+  const Video = await prisma.service.upsert({
+    where: { id: 5 },
+    update: {},
+    create: {
+        minPrice: 100,
+        maxPrice: 1000,
+        address: '342 Best Buy Blvd',
+        range: 0,
+        name: "Abby's Videography",
+        description: 'I take pictures and Videos for events.',
+        vendor: {connect: Abby},
+        type: {connect: Production}
+    },
+  })
+
 }
 main()
   .then(async () => {
