@@ -65,4 +65,8 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 npx prisma studio
 ```
 
+## Requirements Currently Finished
+
+6, 14, 15, 21, 23
+
 
