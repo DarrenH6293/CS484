@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
-import bcrypt from "bcryptjs";
-import { useSession } from "next-auth/react";
-import { getSession } from "next-auth/react";
-import { checkLoggedIn } from "@/lib/auth";
+import fs from 'fs';
+import path from 'path';
+
 export async function GET() {
   try {
     const services = await prisma.service.findMany({
@@ -22,6 +21,7 @@ export async function GET() {
 export async function POST(request) {
   try {
     const data = await request.json();
+
     const {
       name,
       description,
@@ -31,8 +31,10 @@ export async function POST(request) {
       range,
       typeID,
       vendorID,
+      image,
     } = data;
 
+    // Create service without image first
     const newService = await prisma.Service.create({
       data: {
         minPrice,
@@ -49,10 +51,23 @@ export async function POST(request) {
         },
       },
     });
-    return NextResponse.json(
-      { status: 200 },
-      { body: { message: "Service created successfully", service: newService } }
-    );
+
+    if (image && image.data) {
+      const buffer = Buffer.from(image.data, 'base64');
+      const fileName = `${newService.id}.png`;
+      const filePath = path.join(process.cwd(), 'public', 'images', 'vendor', fileName);
+
+      await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
+      await fs.promises.writeFile(filePath, buffer);
+
+      // Update the service with the image path
+      await prisma.Service.update({
+        where: { id: newService.id },
+        data: { image: filePath },
+      });
+    }
+
+    return NextResponse.json({ status: 200, service: newService });
   } catch (error) {
     console.error("Error creating service:", error);
     return NextResponse.json(
@@ -61,3 +76,35 @@ export async function POST(request) {
     );
   }
 }
+
+export async function DELETE(request) {
+  const data = await request.json();
+  const { id } = data;
+  try {
+    // Retrieve the service including the image path
+    const service = await prisma.service.findUnique({
+      where: { id },
+      select: {
+        image: true
+      }
+    });
+
+    // Delete the service from the database
+    await prisma.service.delete({
+      where: { id },
+    });
+
+    if (service && service.image) {
+      await fs.promises.unlink(service.image);
+    }
+
+    return NextResponse.json({ status: 200, service: id });
+  } catch (error) {
+    console.error("Error deleting service:", error);
+    return NextResponse.json(
+      { status: 500 },
+      { body: { message: "Internal Server Error" } }
+    );
+  }
+}
+

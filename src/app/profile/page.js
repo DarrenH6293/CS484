@@ -37,7 +37,6 @@ export default function Profile() {
     const fetchCurrentUser = async () => {
       const session = await getSession();
       if (!session) {
-        // Handle case where user is not authenticated
         setLoading(false); // Update loading state
         return;
       }
@@ -51,13 +50,7 @@ export default function Profile() {
         const user = data.users.find(
           (user) => user.email === session.user.email
         );
-        const dbServicesResp = await fetch("/api/servicesProfile");
-        const serviceData = await dbServicesResp.json();
-        const vendorServices = serviceData.services.filter(
-          (service) => service.vendorID === user.id
-        );
         setCurrentUser(user);
-        setServices(vendorServices || []);
       } catch (error) {
         console.error(error);
       } finally {
@@ -67,6 +60,31 @@ export default function Profile() {
 
     fetchCurrentUser();
   }, []);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      if (!currentUser) return;
+
+      try {
+        setLoading(true); // Set loading state to true before fetching services
+        const dbServicesResp = await fetch("/api/servicesProfile");
+        if (!dbServicesResp.ok) {
+          throw new Error("Failed to fetch services");
+        }
+        const serviceData = await dbServicesResp.json();
+        const vendorServices = serviceData.services.filter(
+          (service) => service.vendorID === currentUser.id
+        );
+        setServices(vendorServices || []);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false); // Set loading state to false after fetching services
+      }
+    };
+
+    fetchServices();
+  }, [currentUser]);
 
   // Loading page...
   if (loading) {
@@ -81,17 +99,40 @@ export default function Profile() {
     setOpenDialog(false);
   }
 
+  const deleteService = async (serviceId) => {
+    try {
+      const response = await fetch(`/api/servicesProfile`, {
+        method: 'DELETE',
+        body: JSON.stringify({ id: serviceId })
+      });
+
+      const responseData = await response.json();
+
+      if (response.ok) {
+        if (responseData.status === 200) {
+          // Update services state after deletion
+          setServices((prevServices) => prevServices.filter(service => service.id !== serviceId));
+        } else {
+          throw new Error('Failed to delete service');
+        }
+      } else {
+        throw new Error('Failed to delete service');
+      }
+    } catch (error) {
+      console.error('Error deleting service:', error);
+    }
+  };
+
   // Function to add service for vendors
-  // To-do: Add backend
   async function handleAddService() {
-    // Perform validation
     if (
       !serviceName ||
       !serviceDescription ||
       !serviceMinPrice ||
       !serviceMaxPrice ||
       !serviceAddress ||
-      !serviceRange
+      !serviceRange ||
+      !selectedFile
     ) {
       setError(true);
       return;
@@ -99,32 +140,51 @@ export default function Profile() {
 
     setError(false);
 
-    const newService = {
-      name: serviceName,
-      description: serviceDescription,
-      minPrice: Number(serviceMinPrice),
-      maxPrice: Number(serviceMaxPrice),
-      address: serviceAddress,
-      range: Number(serviceRange),
-      typeID: Number(serviceTypeID),
-      vendorID: Number(currentUser.id),
-      image: selectedFile,
-    };
-    const response = await fetch("/api/servicesProfile", {
-      method: "POST",
-      body: JSON.stringify(newService),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    setServices((prevServices) => [...prevServices, newService]);
+    const reader = new FileReader();
+    reader.readAsDataURL(selectedFile);
+    reader.onloadend = async function () {
+      const base64data = reader.result.split(",")[1];
 
-    setOpenDialog(false);
+      const newService = {
+        name: serviceName,
+        description: serviceDescription,
+        minPrice: Number(serviceMinPrice),
+        maxPrice: Number(serviceMaxPrice),
+        address: serviceAddress,
+        range: Number(serviceRange),
+        typeID: Number(serviceTypeID),
+        vendorID: Number(currentUser.id),
+        image: {
+          data: base64data,
+        },
+      };
+
+      try {
+        const response = await fetch("/api/servicesProfile", {
+          method: "POST",
+          body: JSON.stringify(newService),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        if (!response.ok) {
+          throw new Error("Failed to add service");
+        }
+        const responseData = await response.json();
+        if (responseData.hasOwnProperty('service')) {
+          responseData.service.image = `/images/vendor/${responseData.service.id}.png`;
+          setServices((prevServices) => [...prevServices, responseData.service]);
+        } else {
+          console.error("Unexpected response format:", responseData);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+
+      setOpenDialog(false);
+    };
   }
 
-  const handleFileChange = (e) => {
-    setSelectedFile(e.target.files[0]);
-  };
 
   return (
     <>
@@ -149,15 +209,17 @@ export default function Profile() {
                     cursor: "pointer",
                   }}
                 >
-                  {/* Check if service has an image, if not, use placeholder */}
                   {service.image ? (
                     <img
-                      src={URL.createObjectURL(service.image)}
+                      src={`/images/vendor/${service.id}.png`}
                       alt={service.name}
                       style={{
                         width: "100%",
-                        height: "auto",
+                        height: "250px",
+                        objectFit: "fill",
+                        objectPosition: "center",
                         marginBottom: "8px",
+                        borderRadius: '10px'
                       }}
                     />
                   ) : (
@@ -166,8 +228,11 @@ export default function Profile() {
                       alt="Placeholder"
                       style={{
                         width: "100%",
-                        height: "auto",
+                        height: "250px",
+                        objectFit: "fill",
+                        objectPosition: "center",
                         marginBottom: "8px",
+                        borderRadius: '10px'
                       }}
                     />
                   )}
@@ -175,7 +240,7 @@ export default function Profile() {
                     Name: {service.name}
                   </Typography>
                   <Typography variant="body2" gutterBottom>
-                    Description: {service.description}
+                    Type: {service.type.name}
                   </Typography>
                   <Typography variant="body2" gutterBottom>
                     Min Price: {service.minPrice}
@@ -202,6 +267,16 @@ export default function Profile() {
                   >
                     Edit
                   </Button>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    sx={{
+                      position: "absolute",
+                      top: "8px", // Adjust this value for vertical positioning
+                      right: "8px", // Adjust this value for horizontal positioning
+                    }}
+                    onClick={() => deleteService(service.id)} // Pass service id to delete function
+                  ></Button>
                 </Box>
               </Grid>
             ))}
@@ -240,7 +315,7 @@ export default function Profile() {
               <input
                 type="file"
                 accept="image/jpeg, image/png, image/gif"
-                onChange={handleFileChange}
+                onChange={(e) => setSelectedFile(e.target.files[0])}
               />
               <br></ br>
               <TextField

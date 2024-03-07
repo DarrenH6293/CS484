@@ -42,7 +42,7 @@ export default function Home() {
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(10000);
-  
+
   useEffect(() => {
     async function fetchServices() {
       try {
@@ -188,28 +188,28 @@ export default function Home() {
           {/* Divider */}
           <Divider sx={{ my: 1 }} />
 
-           {/* Price */}
-           <FormControl fullWidth sx={{ my: 1 }}>
+          {/* Price */}
+          <FormControl fullWidth sx={{ my: 1 }}>
             <p>Price</p>
             <Box>
               <TextField
-                InputProps={{startAdornment: <InputAdornment position="start">$</InputAdornment>}}
+                InputProps={{ startAdornment: <InputAdornment position="start">$</InputAdornment> }}
                 label='Minimum Price'
                 placeholder='0'
                 value={minPrice}
-                style = {{width: 120}}
+                style={{ width: 120 }}
                 name="minPrice"
                 onChange={(e) => setMinPrice(e.target.value)}
               >
-              </TextField> 
+              </TextField>
               <MinimizeIcon></MinimizeIcon>
               <TextField
-                InputProps={{ startAdornment: <InputAdornment position="start">$</InputAdornment>}}
+                InputProps={{ startAdornment: <InputAdornment position="start">$</InputAdornment> }}
                 autoWidth
                 label="Maximum Price"
                 value={maxPrice}
                 placeholder='100'
-                style = {{width: 120}}
+                style={{ width: 120 }}
                 onChange={(e) => setMaxPrice(e.target.value)}
                 name="maxPirce">
               </TextField>
@@ -251,19 +251,36 @@ export default function Home() {
       </Modal>
 
 
-      <ImageList id='services' cols={4} gap={10} sx={{width: 1, height: 0.5, borderRadius: '10px' }}>
+      <ImageList id='services' cols={4} gap={10} sx={{ width: 1, height: 0.5, borderRadius: '10px' }}>
         {filterServices().map((service) => (
           <ImageListItem key={service.id}>
-            <img
-              src="/images/placeholder.png"
-              alt="Placeholder"
-              style={{
-                width: "100%",
-                height: "auto",
-                marginBottom: "8px",
-                borderRadius: '10px'
-              }}
-            />
+            {service.image ? (
+              <img
+                src={`/images/vendor/${service.id}.png`}
+                alt={service.name}
+                style={{
+                  width: "100%",
+                  height: "250px",
+                  objectFit: "fill",
+                  objectPosition: "center",
+                  marginBottom: "8px",
+                  borderRadius: '10px'
+                }}
+              />
+            ) : (
+              <img
+                src="/images/placeholder.png"
+                alt="Placeholder"
+                style={{
+                  width: "100%",
+                  height: "250px",
+                  objectFit: "fill",
+                  objectPosition: "center",
+                  marginBottom: "8px",
+                  borderRadius: '10px'
+                }}
+              />
+            )}
             <ImageListItemBar
               sx={{ backgroundColor: '#F0F0F0', borderRadius: '5px 5px 5px 5px' }}
               title={<span style={{ padding: 5, textAlign: 'center' }}><b><Link href={`/service/${service.id}`}>{service.name}</Link></b></span>}
