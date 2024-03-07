@@ -285,7 +285,7 @@ export default function Home() {
               sx={{ backgroundColor: '#F0F0F0', borderRadius: '5px 5px 5px 5px' }}
               title={<span style={{ padding: 5, textAlign: 'center' }}><b><Link href={`/service/${service.id}`}>{service.name}</Link></b></span>}
               subtitle={<div>
-                <span style={{ textAlign: 'center', padding: 5 }}><b>Type:</b>{service.type.name}</span><br />
+                <span style={{ textAlign: 'center', padding: 5 }}><b>Type:</b> {service.type.name}</span><br />
                 <span style={{ textAlign: 'center', padding: 5 }}><b>Price:</b> ${service.minPrice} - ${service.maxPrice}</span><br />
                 <span style={{ padding: 5, textAlign: 'center' }}><b>Location:</b> {service.address}</span>
               </div>}
