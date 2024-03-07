@@ -1,5 +1,6 @@
 'use client'
 import Image from 'next/image'
+import Link from "next/link";
 import TextField from "@mui/material/TextField";
 import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
@@ -19,7 +20,6 @@ import { Chip, Stack, Modal, Typography, FormControl, InputLabel, Select, Button
 import CloseIcon from '@mui/icons-material/Close';
 import { useState, useEffect } from 'react';
 import { NextResponse } from 'next/server';
-
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -268,7 +268,7 @@ export default function Home() {
               sx={{ backgroundColor: '#F0F0F0', borderRadius: '5px 5px 5px 5px' }}
               title={<span style={{ padding: 5, textAlign: 'center' }}><b><Link href={`/service/${service.id}`}>{service.name}</Link></b></span>}
               subtitle={<div>
-                <span style={{ textAlign: 'center', padding: 5 }}><b>Type:</b>{service.type.name}</span><br />
+                <span style={{ textAlign: 'center', padding: 5 }}><b>Type:</b> {service.type.name}</span><br />
                 <span style={{ textAlign: 'center', padding: 5 }}><b>Price:</b> ${service.minPrice} - ${service.maxPrice}</span><br />
                 <span style={{ padding: 5, textAlign: 'center' }}><b>Location:</b> {service.address}</span>
               </div>}
