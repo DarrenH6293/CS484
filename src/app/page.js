@@ -164,7 +164,7 @@ export default function Home() {
           {/* Divider */}
           <Divider sx={{ my: 2 }} />
 
-          {/* Tags */}
+          {/* Tags */}  
           <FormControl fullWidth sx={{ my: 1 }}>
             <Typography variant="subtitle1" gutterBottom>
               Tags

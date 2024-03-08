@@ -14,6 +14,9 @@ import {
   DialogActions,
   MenuItem
 } from "@mui/material";
+import IconButton from '@mui/material/IconButton';
+import ClearIcon from '@mui/icons-material/Clear';
+import { Clear } from "@mui/icons-material";
 
 export default function Profile() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -98,6 +101,13 @@ export default function Profile() {
 
   function handleCloseDialog() {
     setOpenDialog(false);
+  }
+
+  function confirmDelete(serviceID){
+    if (confirm('Are you sure you want to delete this service?')){
+      deleteService(serviceID);
+    }
+    
   }
 
   const deleteService = async (serviceId) => {
@@ -197,6 +207,7 @@ export default function Profile() {
       {currentUser.role === "VENDOR" && (
         <>
           <h1>My Profile (Vendor)</h1>
+          <h2> Notifications </h2>
           <h2>My Services</h2>
           <Grid container spacing={3} sx={{ maxWidth: "1400px", margin: "0" }}>
             {services.map((service, index) => (
@@ -268,16 +279,16 @@ export default function Profile() {
                   >
                     Edit
                   </Button>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    sx={{
+                  <IconButton aria-label="delete" color="warning" 
+                  sx={{
                       position: "absolute",
                       top: "8px", // Adjust this value for vertical positioning
                       right: "8px", // Adjust this value for horizontal positioning
                     }}
-                    onClick={() => deleteService(service.id)} // Pass service id to delete function
-                  ></Button>
+                    onClick={() => confirmDelete(service.id)}>
+                      <ClearIcon></ClearIcon>
+                  </IconButton>
+                  
                 </Box>
               </Grid>
             ))}
