@@ -49,7 +49,7 @@ async function main() {
         role: "VENDOR",
         displayName: "Bob Joe",
         email: "bobjoe@mail.com",
-        password: 'bobjoe',
+        password: '$2a$10$84oyAnFXYhrFoHPx1Qm/OeYoVFr2jHKJsC9.5LPmTnXvLLfpRb5Yu',
         phone: '1231234321'
     },
   })
@@ -61,7 +61,7 @@ async function main() {
         role: "CUSTOMER",
         displayName: "Jane Joe",
         email: "janedoe@mail.com",
-        password: 'janedoe',
+        password: '$2a$10$FvXwmDWSRgh80pvFepzfZ.dYdevSeB/SVXp6zZvStafMyGvyn8xB.',
         phone: '3234567890'
     },
   })
@@ -73,7 +73,7 @@ async function main() {
         role: "VENDOR",
         displayName: "Ben",
         email: "benten@mail.com",
-        password: 'benten',
+        password: '$2a$10$JHiKJ6MeN.LL1BEcwgT4VeTFZ9Enkgj70II8OICI17uvV/B8EYVCa',
         phone: '1020309293'
     },
   })
@@ -85,7 +85,7 @@ async function main() {
         role: "VENDOR",
         displayName: "Abby",
         email: "abby@mail.com",
-        password: 'abby',
+        password: '$2a$10$ikQRjQRyxZpBZIdEoLUOt.fQv37eSVViWbOG1/GIQqyX8ONa1GBJ.',
         phone: '2232233344'
     },
   })
@@ -97,7 +97,7 @@ async function main() {
         role: "VENDOR",
         displayName: "Carl",
         email: "carljr@mail.com",
-        password: 'carljr',
+        password: '$2a$10$NPW5YTm2k3JXFdKaty7tz.9eAAeR.gipjastfhVav3xVa7k3Op50y',
         phone: '4204204201'
     },
   })
@@ -109,7 +109,7 @@ async function main() {
         role: "VENDOR",
         displayName: "Hank",
         email: "hankgreen@mail.com",
-        password: 'hankgreen',
+        password: '$2a$10$O2u6VcwMgKkVcjLPaOVoCe0JfXAPo/eis.MHJvMwtE9kNSCyuyr1a',
         phone: '6904293029'
     },
   })

@@ -32,6 +32,7 @@ export default function Profile() {
   const [services, setServices] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [serviceTypeID, setServiceTypeID] = useState(1);
+  const types = [null, 'Venue', 'Entertainment', 'Catering', 'Production', 'Decoration']
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -240,7 +241,7 @@ export default function Profile() {
                     Name: {service.name}
                   </Typography>
                   <Typography variant="body2" gutterBottom>
-                    Type: {service.type.name}
+                    Type: {types[service.typeID]}
                   </Typography>
                   <Typography variant="body2" gutterBottom>
                     Min Price: {service.minPrice}
