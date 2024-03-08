@@ -14,6 +14,9 @@ import {
   DialogActions,
   MenuItem
 } from "@mui/material";
+import IconButton from '@mui/material/IconButton';
+import ClearIcon from '@mui/icons-material/Clear';
+import { Clear } from "@mui/icons-material";
 
 export default function Profile() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -99,11 +102,11 @@ export default function Profile() {
     setOpenDialog(false);
   }
 
-  function handleEditService(service) {
-    // Set the service data to the state variable
-    setEditService(service);
-    // Open the dialog box for editing
-    setOpenEditDialog(true);
+  function confirmDelete(serviceID){
+    if (confirm('Are you sure you want to delete this service?')){
+      deleteService(serviceID);
+    }
+    
   }
 
   const deleteService = async (serviceId) => {
@@ -203,6 +206,7 @@ export default function Profile() {
       {currentUser.role === "VENDOR" && (
         <>
           <h1>My Profile (Vendor)</h1>
+          <h2> Notifications </h2>
           <h2>My Services</h2>
           <Grid container spacing={3} sx={{ maxWidth: "1400px", margin: "0" }}>
             {services.map((service, index) => (
@@ -274,43 +278,16 @@ export default function Profile() {
                   >
                     Edit
                   </Button>
-                  <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
-                    <DialogTitle>Edit Service</DialogTitle>
-                    <DialogContent>
-                      {/* Populate input fields with service data for editing */}
-                      <TextField
-                        label="Service Name"
-                        value={editService ? editService.name : ""}
-                        onChange={(e) => setEditService({ ...editService, name: e.target.value })}
-                        fullWidth
-                        margin="normal"
-                      />
-                      <TextField
-                        label="Description"
-                        value={editService ? editService.description : ""}
-                        onChange={(e) => setEditService({ ...editService, description: e.target.value })}
-                        fullWidth
-                        margin="normal"
-                        multiline
-                        rows={4}
-                      />
-                      {/* Add other input fields for editing */}
-                    </DialogContent>
-                    <DialogActions>
-                      <Button onClick={() => setOpenEditDialog(false)}>Cancel</Button>
-                      {/* Add update service button with corresponding onClick handler */}
-                    </DialogActions>
-                  </Dialog>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    sx={{
+                  <IconButton aria-label="delete" color="warning" 
+                  sx={{
                       position: "absolute",
                       top: "8px", // Adjust this value for vertical positioning
                       right: "8px", // Adjust this value for horizontal positioning
                     }}
-                    onClick={() => deleteService(service.id)} // Pass service id to delete function
-                  ></Button>
+                    onClick={() => confirmDelete(service.id)}>
+                      <ClearIcon></ClearIcon>
+                  </IconButton>
+                  
                 </Box>
               </Grid>
             ))}

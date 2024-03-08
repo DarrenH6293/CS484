@@ -47,6 +47,7 @@ export default function Home() {
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(10000);
+  const [searchInput, setSearchInput] = useState("")
 
   useEffect(() => {
     async function fetchServices() {
@@ -72,6 +73,11 @@ export default function Home() {
       filteredServices = filteredServices.filter(service => selectedTypes.includes(service.type.name));
     }
     filteredServices = filteredServices.filter(service => (service.minPrice >= minPrice && service.maxPrice <= maxPrice));
+    if (searchInput != "") {
+      filteredServices = filteredServices.filter(service => 
+        {const name = service.name.toLowerCase();
+          return name.includes(searchInput.toLowerCase())})
+    }
     return filteredServices;
   };
 
@@ -164,6 +170,12 @@ export default function Home() {
     setOpen(true);
   };
 
+
+  const handleChange = (e) => {
+    e.preventDefault();
+    setSearchInput(e.target.value);
+  };
+
   const handleClose = () => {
     setOpen(false);
   };
@@ -201,11 +213,9 @@ export default function Home() {
           <InputBase
             sx={{ ml: 1, flex: 1, justifyContent: 'center' }}
             placeholder="Search for vendors..."
-            inputProps={{ 'aria-label': 'search for vendors' }}
+            onChange={handleChange}
+            value={searchInput}
           />
-          <IconButton aria-label="search">
-            <SearchIcon />
-          </IconButton>
           <Divider orientation="vertical" flexItem />
           <IconButton aria-label="filter" onClick={handleOpen}>
             <TuneIcon />
@@ -250,7 +260,7 @@ export default function Home() {
           {/* Divider */}
           <Divider sx={{ my: 2 }} />
 
-          {/* Tags */}
+          {/* Tags */}  
           <FormControl fullWidth sx={{ my: 1 }}>
             <Typography variant="subtitle1" gutterBottom>
               Tags
