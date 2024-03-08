@@ -43,7 +43,7 @@ export default function Service({ params }) {
     return (
         <div>
             <p>Service ID: {params.index} <br></br>
-            Title: {service.name}</p>
+                Title: {service.name}</p>
             {/* Display other service information here */}
         </div>
     );

@@ -48,7 +48,7 @@ export default function Signup() {
       signUpData['password'] = data.get('password');
       signUpData['displayName'] = data.get('displayName');
       signUpData['phone'] = data.get('phone');
-      signUpData['role'] = data.get('role');    
+      signUpData['role'] = data.get('role');
       // submit form
       fetch("/api/users", {
         method: 'post',

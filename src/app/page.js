@@ -20,6 +20,9 @@ import { Chip, Stack, Modal, Typography, FormControl, InputLabel, Select, Button
 import CloseIcon from '@mui/icons-material/Close';
 import { useState, useEffect } from 'react';
 import { NextResponse } from 'next/server';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import { getSession } from "next-auth/react";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -30,6 +33,8 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 export default function Home() {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [favorites, setFavorites] = useState([]);
   const [tags, setTags] = useState([
     { key: 'tag1', label: 'Venue', selected: false },
     { key: 'tag2', label: 'Entertainment', selected: false },
@@ -70,9 +75,90 @@ export default function Home() {
     return filteredServices;
   };
 
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      const session = await getSession();
+      if (!session) return;
+
+      try {
+        const response = await fetch("/api/users");
+        if (!response.ok) {
+          throw new Error("Failed to fetch users");
+        }
+        const data = await response.json();
+        const user = data.users.find(
+          (user) => user.email === session.user.email
+        );
+        setCurrentUser(user);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchCurrentUser();
+  }, []);
+
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      const session = await getSession();
+      if (!session) return;
+
+      try {
+        const response = await fetch("/api/users");
+        if (!response.ok) {
+          throw new Error("Failed to fetch users");
+        }
+        const data = await response.json();
+        const user = data.users.find(
+          (user) => user.email === session.user.email
+        );
+        setFavorites(user.favorites);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchFavorites();
+  }, []);
+
 
   // Opening filter pop-up
   const [open, setOpen] = useState(false);
+
+  const toggleFavorite = async (userId, service) => {
+    try {
+      const updateFavoriteData = { id: userId, favorites: [service] };
+      try {
+        const response = await fetch(`/api/users`, {
+          method: 'POST',
+          body: JSON.stringify(updateFavoriteData),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          // Toggle favorite successful
+          alert('Service favorited/unfavorited successfully');
+          const newFavorites = currentUser.favorites.some(fav => fav.id === service.id)
+            ? currentUser.favorites.filter(fav => fav.id !== service.id)
+            : [...currentUser.favorites, service];
+          const updatedUser = { ...currentUser, favorites: newFavorites };
+          setCurrentUser(updatedUser);
+        } else {
+          // Toggle favorite failed
+          console.error('Failed to toggle favorite');
+          alert('Failed to toggle favorite');
+        }
+      } catch (error) {
+        console.error('Error toggling favorite:', error);
+        alert('Error toggling favorite');
+      }
+    } catch (error) {
+      console.error('Error preparing favorite data:', error);
+      alert('Error preparing favorite data');
+    }
+  };
 
   const handleOpen = () => {
     setOpen(true);
@@ -290,6 +376,15 @@ export default function Home() {
                 <span style={{ padding: 5, textAlign: 'center' }}><b>Location:</b> {service.address}</span>
               </div>}
               position="below"
+              actionIcon={currentUser && (
+                <IconButton
+                  aria-label={`favorite ${service.name}`}
+                  onClick={() => toggleFavorite(currentUser.id, service)}
+                  sx={{ color: currentUser.favorites.some(fav => fav.id === service.id) ? 'red' : 'black' }}
+                >
+                  {currentUser.favorites.some(fav => fav.id === service.id) ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                </IconButton>
+              )}
             />
           </ImageListItem>
         ))}

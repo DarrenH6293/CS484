@@ -17,9 +17,6 @@ import {
 
 export default function Profile() {
   const [currentUser, setCurrentUser] = useState(null);
-  const [displayName, setDisplayName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -33,6 +30,8 @@ export default function Profile() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [serviceTypeID, setServiceTypeID] = useState(1);
   const types = [null, 'Venue', 'Entertainment', 'Catering', 'Production', 'Decoration']
+  const [editService, setEditService] = useState(null);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -98,6 +97,13 @@ export default function Profile() {
 
   function handleCloseDialog() {
     setOpenDialog(false);
+  }
+
+  function handleEditService(service) {
+    // Set the service data to the state variable
+    setEditService(service);
+    // Open the dialog box for editing
+    setOpenEditDialog(true);
   }
 
   const deleteService = async (serviceId) => {
@@ -268,6 +274,33 @@ export default function Profile() {
                   >
                     Edit
                   </Button>
+                  <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
+                    <DialogTitle>Edit Service</DialogTitle>
+                    <DialogContent>
+                      {/* Populate input fields with service data for editing */}
+                      <TextField
+                        label="Service Name"
+                        value={editService ? editService.name : ""}
+                        onChange={(e) => setEditService({ ...editService, name: e.target.value })}
+                        fullWidth
+                        margin="normal"
+                      />
+                      <TextField
+                        label="Description"
+                        value={editService ? editService.description : ""}
+                        onChange={(e) => setEditService({ ...editService, description: e.target.value })}
+                        fullWidth
+                        margin="normal"
+                        multiline
+                        rows={4}
+                      />
+                      {/* Add other input fields for editing */}
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={() => setOpenEditDialog(false)}>Cancel</Button>
+                      {/* Add update service button with corresponding onClick handler */}
+                    </DialogActions>
+                  </Dialog>
                   <Button
                     variant="contained"
                     color="secondary"
