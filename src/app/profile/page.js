@@ -12,8 +12,9 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  MenuItem
+  MenuItem,
 } from "@mui/material";
+import { Block, ConstructionOutlined } from "@mui/icons-material";
 
 export default function Profile() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -32,60 +33,88 @@ export default function Profile() {
   const [services, setServices] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [serviceTypeID, setServiceTypeID] = useState(1);
-  const types = [null, 'Venue', 'Entertainment', 'Catering', 'Production', 'Decoration']
+  const [bookings, setBookings] = useState([]);
+  const types = [
+    null,
+    "Venue",
+    "Entertainment",
+    "Catering",
+    "Production",
+    "Decoration",
+  ];
 
   useEffect(() => {
-    const fetchCurrentUser = async () => {
-      const session = await getSession();
-      if (!session) {
-        setLoading(false); // Update loading state
-        return;
-      }
-
+    const fetchData = async () => {
       try {
+        setLoading(true);
+        const session = await getSession();
+        if (!session) {
+          setLoading(false); // Update loading state
+          return;
+        }
         const response = await fetch("/api/users");
         if (!response.ok) {
           throw new Error("Failed to fetch users");
         }
-        const data = await response.json();
-        const user = data.users.find(
-          (user) => user.email === session.user.email
+
+        const dataUser = await response.json();
+        const user = dataUser.users.find(
+          (dataUser) => dataUser.email === session.user.email
         );
         setCurrentUser(user);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false); // Update loading state after fetching user
-      }
-    };
+        if (user && user.role != "VENDOR") {
+          const responseBookings = await fetch("/api/bookings");
+          if (!responseBookings.ok) {
+            throw new Error("Failed to fetch bookings");
+          }
 
-    fetchCurrentUser();
-  }, []);
+          const bookingData = await responseBookings.json();
+          const allBookings = bookingData.bookings.filter(
+            (booking) => user.id === booking.customerID
+          );
+          setBookings(allBookings || []);
+          const responseServices = await fetch("/api/servicesProfile");
+          if (!responseServices.ok) {
+            throw new Error("Failed to fetch services");
+          }
 
-  useEffect(() => {
-    const fetchServices = async () => {
-      if (!currentUser) return;
-
-      try {
-        setLoading(true); // Set loading state to true before fetching services
-        const dbServicesResp = await fetch("/api/servicesProfile");
-        if (!dbServicesResp.ok) {
-          throw new Error("Failed to fetch services");
+          const serviceData = await responseServices.json();
+          const bookedServices = serviceData.services.filter((service) =>
+            allBookings.some((booking) => booking.serviceID === service.id)
+          );
+          setServices(bookedServices || []);
         }
-        const serviceData = await dbServicesResp.json();
-        const vendorServices = serviceData.services.filter(
-          (service) => service.vendorID === currentUser.id
-        );
-        setServices(vendorServices || []);
+        if (user && user.role === "VENDOR") {
+          const dbServicesResp = await fetch("/api/servicesProfile");
+          if (!dbServicesResp.ok) {
+            throw new Error("Failed to fetch services");
+          }
+          const serviceData = await dbServicesResp.json();
+          const vendorServices = serviceData.services.filter(
+            (service) => service.vendorID === user.id
+          );
+          setServices(vendorServices || []);
+          const bookingResp = await fetch("/api/bookings");
+          if (!bookingResp.ok) {
+            throw new Error("Failed to fetch bookings");
+          }
+          const bookingData = await bookingResp.json();
+          const allBookings = bookingData.bookings.filter(
+            // need to check if each booking is associated with any of our services...
+            (booking) =>
+              vendorServices.some((service) => service.id === booking.serviceID)
+          );
+          setBookings(allBookings || []);
+        }
       } catch (error) {
         console.error(error);
       } finally {
-        setLoading(false); // Set loading state to false after fetching services
+        setLoading(false);
       }
     };
 
-    fetchServices();
-  }, [currentUser]);
+    fetchData();
+  }, []);
 
   // Loading page...
   if (loading) {
@@ -103,8 +132,8 @@ export default function Profile() {
   const deleteService = async (serviceId) => {
     try {
       const response = await fetch(`/api/servicesProfile`, {
-        method: 'DELETE',
-        body: JSON.stringify({ id: serviceId })
+        method: "DELETE",
+        body: JSON.stringify({ id: serviceId }),
       });
 
       const responseData = await response.json();
@@ -112,15 +141,17 @@ export default function Profile() {
       if (response.ok) {
         if (responseData.status === 200) {
           // Update services state after deletion
-          setServices((prevServices) => prevServices.filter(service => service.id !== serviceId));
+          setServices((prevServices) =>
+            prevServices.filter((service) => service.id !== serviceId)
+          );
         } else {
-          throw new Error('Failed to delete service');
+          throw new Error("Failed to delete service");
         }
       } else {
-        throw new Error('Failed to delete service');
+        throw new Error("Failed to delete service");
       }
     } catch (error) {
-      console.error('Error deleting service:', error);
+      console.error("Error deleting service:", error);
     }
   };
 
@@ -172,9 +203,12 @@ export default function Profile() {
           throw new Error("Failed to add service");
         }
         const responseData = await response.json();
-        if (responseData.hasOwnProperty('service')) {
+        if (responseData.hasOwnProperty("service")) {
           responseData.service.image = `/images/vendor/${responseData.service.id}.png`;
-          setServices((prevServices) => [...prevServices, responseData.service]);
+          setServices((prevServices) => [
+            ...prevServices,
+            responseData.service,
+          ]);
         } else {
           console.error("Unexpected response format:", responseData);
         }
@@ -185,208 +219,380 @@ export default function Profile() {
       setOpenDialog(false);
     };
   }
+  const handleReject = async (booking) => {
+    try {
+      const data = { id: booking.id, status: false, hasBeenConfirmed: true };
 
+      // Update the status of the booking
+      const updatedBooking = { ...booking, status: "rejected" };
 
+      // Send a request to update the booking status
+      const response = await fetch(`/api/bookings`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update booking status");
+      }
+      const updatedBookings = bookings.map((b) =>
+        b.id === booking.id
+          ? { ...b, status: false, hasBeenConfirmed: true }
+          : b
+      );
+      setBookings(updatedBookings);
+
+      // Perform additional logic if needed
+    } catch (error) {
+      console.error("Error rejecting booking:", error);
+    }
+  };
+
+  const handleAccept = async (booking) => {
+    try {
+      const data = { id: booking.id, status: true, hasBeenConfirmed: true };
+      const updatedBooking = { ...booking, status: "accepted" };
+
+      // Send a request to update the booking status
+      const response = await fetch(`/api/bookings`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update booking status");
+      }
+      const updatedBookings = bookings.map((b) =>
+        b.id === booking.id ? { ...b, status: true, hasBeenConfirmed: true } : b
+      );
+      setBookings(updatedBookings);
+      // Perform additional logic if needed
+    } catch (error) {
+      console.error("Error accepting booking:", error);
+    }
+  };
+
+  // Function to format dateTime objects
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+
+    const options = {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    };
+
+    return new Intl.DateTimeFormat("en-US", options).format(date);
+  }
+  console.log(services);
   return (
     <>
-      {currentUser.role === "CUSTOMER" && (
+      {currentUser && (
         <>
-          <h1>My Profile (Customer)</h1>
-        </>
-      )}
-      {currentUser.role === "VENDOR" && (
-        <>
-          <h1>My Profile (Vendor)</h1>
-          <h2>My Services</h2>
-          <Grid container spacing={3} sx={{ maxWidth: "1400px", margin: "0" }}>
-            {services.map((service, index) => (
-              <Grid item xs="auto" sm="auto" md={3} key={index}>
-                <Box
-                  sx={{
-                    border: "1px solid #ccc",
-                    borderRadius: "8px",
-                    padding: "16px",
-                    position: "relative",
-                    cursor: "pointer",
-                  }}
-                >
-                  {service.image ? (
-                    <img
-                      src={`/images/vendor/${service.id}.png`}
-                      alt={service.name}
+          {currentUser.role === "CUSTOMER" && (
+            <>
+              <h1>My Profile (Customer)</h1>
+              <h2>Bookings</h2>
+              {bookings &&
+                bookings.map((booking, index) => (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      padding: "16px",
+                    }}
+                    key={index}
+                  >
+                    <div
                       style={{
-                        width: "100%",
-                        height: "250px",
-                        objectFit: "fill",
-                        objectPosition: "center",
-                        marginBottom: "8px",
-                        borderRadius: '10px'
+                        display: "inline-block",
+                        border: "1px solid black",
+                        borderRadius: "8px",
+                        padding: "16px",
+                        backgroundColor: "gray",
+                        color: "white", // You can adjust the text color based on your preference
                       }}
-                    />
-                  ) : (
+                      className="booking"
+                      key={index}
+                    >
+                      <h3>{`Service Name: ${
+                        services.find((s) => s.id === booking.serviceID)?.name
+                      }`}</h3>
+                      <p>{`Start Date: ${formatDate(booking.start)}`}</p>
+                      <p>{`End Date: ${formatDate(booking.end)}`}</p>
+                      <p>{`Proposed Price: ${booking.price}`}</p>
+                      <p>{`Status: ${
+                        booking.hasBeenConfirmed === false
+                          ? "Pending"
+                          : booking.status
+                          ? "Accepted"
+                          : "Rejected"
+                      }`}</p>
+                    </div>
+                  </div>
+                ))}
+            </>
+          )}
+          {currentUser.role === "VENDOR" && (
+            <>
+              <h1>My Profile (Vendor)</h1>
+              <h2>My Services</h2>
+              <Grid
+                container
+                spacing={3}
+                sx={{ maxWidth: "1400px", margin: "0" }}
+              >
+                {services &&
+                  services.map((service, index) => (
+                    <Grid item xs="auto" sm="auto" md={3} key={index}>
+                      <Box
+                        sx={{
+                          border: "1px solid #ccc",
+                          borderRadius: "8px",
+                          padding: "16px",
+                          position: "relative",
+                          cursor: "pointer",
+                        }}
+                      >
+                        {service.image ? (
+                          <img
+                            src={`/images/vendor/${service.id}.png`}
+                            alt={service.name}
+                            style={{
+                              width: "100%",
+                              height: "250px",
+                              objectFit: "fill",
+                              objectPosition: "center",
+                              marginBottom: "8px",
+                              borderRadius: "10px",
+                            }}
+                          />
+                        ) : (
+                          <img
+                            src="/images/placeholder.png"
+                            alt="Placeholder"
+                            style={{
+                              width: "100%",
+                              height: "250px",
+                              objectFit: "fill",
+                              objectPosition: "center",
+                              marginBottom: "8px",
+                              borderRadius: "10px",
+                            }}
+                          />
+                        )}
+                        <Typography variant="subtitle1" gutterBottom>
+                          Name: {service.name}
+                        </Typography>
+                        <Typography variant="body2" gutterBottom>
+                          Type: {types[service.typeID]}
+                        </Typography>
+                        <Typography variant="body2" gutterBottom>
+                          Min Price: {service.minPrice}
+                        </Typography>
+                        <Typography variant="body2" gutterBottom>
+                          Max Price: {service.maxPrice}
+                        </Typography>
+                        <Typography variant="body2" gutterBottom>
+                          Address: {service.address}
+                        </Typography>
+                        <Typography variant="body2" gutterBottom>
+                          Range: {service.range}
+                        </Typography>
+                        {/* Edit button */}
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          sx={{
+                            position: "absolute",
+                            bottom: "8px", // Adjust this value for vertical positioning
+                            right: "8px", // Adjust this value for horizontal positioning
+                          }}
+                          onClick={() => handleEditService(service)} // Pass the service data to the edit function
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="contained"
+                          color="secondary"
+                          sx={{
+                            position: "absolute",
+                            top: "8px", // Adjust this value for vertical positioning
+                            right: "8px", // Adjust this value for horizontal positioning
+                          }}
+                          onClick={() => deleteService(service.id)} // Pass service id to delete function
+                        ></Button>
+                      </Box>
+                    </Grid>
+                  ))}
+                <Grid item xs={12} sm="auto" md={3}>
+                  <Box
+                    sx={{
+                      border: "1px solid #ccc",
+                      borderRadius: "8px",
+                      padding: "16px",
+                      textAlign: "center",
+                      cursor: "pointer",
+                    }}
+                    onClick={handleOpenDialog}
+                  >
                     <img
                       src="/images/placeholder.png"
                       alt="Placeholder"
                       style={{
                         width: "100%",
-                        height: "250px",
-                        objectFit: "fill",
-                        objectPosition: "center",
+                        height: "auto",
+                        aspectRatio: "4 / 3",
+                        objectFit: "contain",
                         marginBottom: "8px",
-                        borderRadius: '10px'
                       }}
                     />
-                  )}
-                  <Typography variant="subtitle1" gutterBottom>
-                    Name: {service.name}
-                  </Typography>
-                  <Typography variant="body2" gutterBottom>
-                    Type: {types[service.typeID]}
-                  </Typography>
-                  <Typography variant="body2" gutterBottom>
-                    Min Price: {service.minPrice}
-                  </Typography>
-                  <Typography variant="body2" gutterBottom>
-                    Max Price: {service.maxPrice}
-                  </Typography>
-                  <Typography variant="body2" gutterBottom>
-                    Address: {service.address}
-                  </Typography>
-                  <Typography variant="body2" gutterBottom>
-                    Range: {service.range}
-                  </Typography>
-                  {/* Edit button */}
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    sx={{
-                      position: "absolute",
-                      bottom: "8px", // Adjust this value for vertical positioning
-                      right: "8px", // Adjust this value for horizontal positioning
-                    }}
-                    onClick={() => handleEditService(service)} // Pass the service data to the edit function
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    sx={{
-                      position: "absolute",
-                      top: "8px", // Adjust this value for vertical positioning
-                      right: "8px", // Adjust this value for horizontal positioning
-                    }}
-                    onClick={() => deleteService(service.id)} // Pass service id to delete function
-                  ></Button>
-                </Box>
+                    <Typography variant="subtitle1" gutterBottom>
+                      Click to add a service
+                    </Typography>
+                  </Box>
+                </Grid>
               </Grid>
-            ))}
-            <Grid item xs={12} sm="auto" md={3}>
-              <Box
-                sx={{
-                  border: "1px solid #ccc",
-                  borderRadius: "8px",
-                  padding: "16px",
-                  textAlign: "center",
-                  cursor: "pointer",
-                }}
-                onClick={handleOpenDialog}
-              >
-                <img
-                  src="/images/placeholder.png"
-                  alt="Placeholder"
-                  style={{
-                    width: "100%",
-                    height: "auto",
-                    aspectRatio: "4 / 3",
-                    objectFit: "contain",
-                    marginBottom: "8px",
-                  }}
-                />
-                <Typography variant="subtitle1" gutterBottom>
-                  Click to add a service
-                </Typography>
-              </Box>
-            </Grid>
-          </Grid>
-          <Dialog open={openDialog} onClose={handleCloseDialog}>
-            <DialogTitle>Add New Service</DialogTitle>
-            <DialogContent>
-              Add a service image<br></ br>
-              <input
-                type="file"
-                accept="image/jpeg, image/png, image/gif"
-                onChange={(e) => setSelectedFile(e.target.files[0])}
-              />
-              <br></ br>
-              <TextField
-                label="Service Name"
-                value={serviceName}
-                onChange={(e) => setServiceName(e.target.value)}
-                fullWidth
-                margin="normal"
-              />
-              <TextField
-                label="Description"
-                value={serviceDescription}
-                onChange={(e) => setServiceDescription(e.target.value)}
-                fullWidth
-                margin="normal"
-                multiline
-                rows={4}
-              />
-              <TextField
-                label="Minimum Price"
-                value={serviceMinPrice}
-                onChange={(e) => setServiceMinPrice(e.target.value)}
-                fullWidth
-                margin="normal"
-              />
-              <TextField
-                label="Maximum Price"
-                value={serviceMaxPrice}
-                onChange={(e) => setServiceMaxPrice(e.target.value)}
-                fullWidth
-                margin="normal"
-              />
-              <TextField
-                label="Address"
-                value={serviceAddress}
-                onChange={(e) => setServiceAddress(e.target.value)}
-                fullWidth
-                margin="normal"
-              />
-              <TextField
-                label="Range"
-                value={serviceRange}
-                onChange={(e) => setServiceRange(e.target.value)}
-                fullWidth
-                margin="normal"
-              />
-              <TextField
-                label="Type"
-                select
-                value={serviceTypeID}
-                onChange={(e) => setServiceTypeID(e.target.value)}
-                fullWidth
-                margin="normal"
-              >
-                <MenuItem value={1}>Venue</MenuItem>
-                <MenuItem value={2}>Entertainment</MenuItem>
-                <MenuItem value={3}>Catering</MenuItem>
-                <MenuItem value={4}>Production</MenuItem>
-                <MenuItem value={5}>Decoration</MenuItem>
-              </TextField>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleCloseDialog}>Cancel</Button>
-              <Button onClick={handleAddService} color="primary">
-                Add
-              </Button>
-            </DialogActions>
-          </Dialog>
+              <h2>Bookings</h2>
+              {bookings &&
+                bookings.map((booking, index) => (
+                  <div className="booking" key={index}>
+                    <h3>{`Service Name: ${
+                      services.find((s) => s.id === booking.serviceID)?.name
+                    }`}</h3>
+                    <p>{`Start Date: ${formatDate(booking.start)}`}</p>
+                    <p>{`End Date: ${formatDate(booking.end)}`}</p>
+                    <p>{`Proposed Price: ${booking.price}`}</p>
+                    <p>{`Status: ${
+                      booking.hasBeenConfirmed === false
+                        ? "Pending"
+                        : booking.status
+                        ? "Accepted"
+                        : "Rejected"
+                    }`}</p>
+
+                    {booking.hasBeenConfirmed == false && (
+                      <>
+                        <button
+                          style={{
+                            backgroundColor: "red",
+                            borderRadius: "6px",
+                            color: "white",
+                            padding: "8px",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => handleReject(booking)}
+                        >
+                          Reject
+                        </button>
+                        <button
+                          style={{
+                            backgroundColor: "green",
+                            borderRadius: "6px",
+                            color: "white",
+                            padding: "8px",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => handleAccept(booking)}
+                        >
+                          Accept
+                        </button>
+                      </>
+                    )}
+                  </div>
+                ))}
+
+              <Dialog open={openDialog} onClose={handleCloseDialog}>
+                <DialogTitle>Add New Service</DialogTitle>
+                <DialogContent>
+                  Add a service image<br></br>
+                  <input
+                    type="file"
+                    accept="image/jpeg, image/png, image/gif"
+                    onChange={(e) => setSelectedFile(e.target.files[0])}
+                  />
+                  <br></br>
+                  <TextField
+                    label="Service Name"
+                    value={serviceName}
+                    onChange={(e) => setServiceName(e.target.value)}
+                    fullWidth
+                    margin="normal"
+                  />
+                  <TextField
+                    label="Description"
+                    value={serviceDescription}
+                    onChange={(e) => setServiceDescription(e.target.value)}
+                    fullWidth
+                    margin="normal"
+                    multiline
+                    rows={4}
+                  />
+                  <TextField
+                    label="Minimum Price"
+                    value={serviceMinPrice}
+                    onChange={(e) => setServiceMinPrice(e.target.value)}
+                    fullWidth
+                    margin="normal"
+                  />
+                  <TextField
+                    label="Maximum Price"
+                    value={serviceMaxPrice}
+                    onChange={(e) => setServiceMaxPrice(e.target.value)}
+                    fullWidth
+                    margin="normal"
+                  />
+                  <TextField
+                    label="Address"
+                    value={serviceAddress}
+                    onChange={(e) => setServiceAddress(e.target.value)}
+                    fullWidth
+                    margin="normal"
+                  />
+                  <TextField
+                    label="Range"
+                    value={serviceRange}
+                    onChange={(e) => setServiceRange(e.target.value)}
+                    fullWidth
+                    margin="normal"
+                  />
+                  <TextField
+                    label="Type"
+                    select
+                    value={serviceTypeID}
+                    onChange={(e) => setServiceTypeID(e.target.value)}
+                    fullWidth
+                    margin="normal"
+                  >
+                    <MenuItem value={1}>Venue</MenuItem>
+                    <MenuItem value={2}>Entertainment</MenuItem>
+                    <MenuItem value={3}>Catering</MenuItem>
+                    <MenuItem value={4}>Production</MenuItem>
+                    <MenuItem value={5}>Decoration</MenuItem>
+                  </TextField>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={handleCloseDialog}>Cancel</Button>
+                  <Button onClick={handleAddService} color="primary">
+                    Add
+                  </Button>
+                </DialogActions>
+              </Dialog>
+            </>
+          )}
         </>
       )}
+      {!currentUser && <div>Sign up to see your profile info here!</div>}
     </>
   );
 }

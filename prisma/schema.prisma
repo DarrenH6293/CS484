@@ -31,15 +31,17 @@ model User {
 }
 
 model Booking {
-  id           Int            @id @default(autoincrement())
-  start        DateTime
-  end          DateTime
-  price        Int
-  customer     User           @relation(fields: [customerID], references: [id])
-  customerID   Int
-  service      Service        @relation(fields: [serviceID], references: [id])
-  serviceID    Int
-  notification Notification[]
+  id               Int            @id @default(autoincrement())
+  status           Boolean
+  hasBeenConfirmed Boolean
+  start            DateTime
+  end              DateTime
+  price            Int
+  customer         User           @relation(fields: [customerID], references: [id])
+  customerID       Int
+  service          Service        @relation(fields: [serviceID], references: [id])
+  serviceID        Int
+  notification     Notification[]
 }
 
 model Notification {
