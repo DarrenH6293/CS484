@@ -3,6 +3,10 @@
 import { useState, useEffect } from 'react';
 import { Box, TextField, Grid, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions, MenuItem } from "@mui/material";
 import { getSession } from "next-auth/react";
+import IconButton from '@mui/material/IconButton';
+import ClearIcon from '@mui/icons-material/Clear';
+import { Clear } from "@mui/icons-material";
+
 
 export default function Favorites() {
 
@@ -38,6 +42,46 @@ export default function Favorites() {
         fetchCurrentUser();
     }, []);
 
+    function confirmRemove(userId, service){
+        if(confirm("Are you sure you want to remove this from your favorites?")){
+            removeFavorite(userId, service);
+        }    
+    }
+    
+    const removeFavorite = async (userId, service) => {
+        try {
+          const updateFavoriteData = { id: userId, favorites: [service] };
+          try {
+            const response = await fetch(`/api/users`, {
+              method: 'POST',
+              body: JSON.stringify(updateFavoriteData),
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            });
+    
+            if (response.ok) {
+              // Toggle favorite successful
+              const newFavorites = currentUser.favorites.some(fav => fav.id === service.id)
+                ? currentUser.favorites.filter(fav => fav.id !== service.id)
+                : [...currentUser.favorites, service];
+              const updatedUser = { ...currentUser, favorites: newFavorites };
+              setCurrentUser(updatedUser);
+            } else {
+              // Toggle favorite failed
+              console.error('Failed to toggle favorite');
+              alert('Failed to toggle favorite');
+            }
+          } catch (error) {
+            console.error('Error toggling favorite:', error);
+            alert('Error toggling favorite');
+          }
+        } catch (error) {
+          console.error('Error preparing favorite data:', error);
+          alert('Error preparing favorite data');
+        }
+      };    
+
     // Loading page...
     if (loading) {
         return <p>Loading...</p>;
@@ -58,6 +102,15 @@ export default function Favorites() {
                                 cursor: "pointer",
                             }}
                         >
+                        <IconButton aria-label="delete" color="warning" 
+                          sx={{
+                              position: "absolute",
+                              top: "8px", // Adjust this value for vertical positioning
+                              right: "8px", // Adjust this value for horizontal positioning
+                            }}
+                          onClick={() => confirmRemove(currentUser.id, service)}>
+                          <ClearIcon></ClearIcon>
+                        </IconButton>
                             {service.image ? (
                                 <img
                                     src={`/images/vendor/${service.id}.png`}

@@ -436,16 +436,15 @@ export default function Profile() {
                         >
                           Edit
                         </Button>
-                        <Button
-                          variant="contained"
-                          color="secondary"
+                        <IconButton aria-label="delete" color="warning" 
                           sx={{
-                            position: "absolute",
-                            top: "8px", // Adjust this value for vertical positioning
-                            right: "8px", // Adjust this value for horizontal positioning
-                          }}
-                          onClick={() => deleteService(service.id)} // Pass service id to delete function
-                        ></Button>
+                              position: "absolute",
+                              top: "8px", // Adjust this value for vertical positioning
+                              right: "8px", // Adjust this value for horizontal positioning
+                            }}
+                          onClick={() => confirmDelete(service.id)}>
+                          <ClearIcon></ClearIcon>
+                        </IconButton>
                       </Box>
                     </Grid>
                   ))}
