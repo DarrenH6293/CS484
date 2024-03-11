@@ -34,14 +34,7 @@ export default function Login() {
   }
 
   function handleSignin() {
-    signIn("normal", { ...formValues, redirect: false }).then((result) => {
-      if (!result.error) {
-        setOpen(false);
-        reset();
-      } else {
-        setError(true);
-      }
-    })
+    signIn("normal", { ...formValues, redirect: true, callbackUrl: '/' })
   }
 
   function handleChange({ field, value }) {

@@ -1,94 +1,112 @@
 'use client'
 
 import { useState, useEffect } from 'react';
-import Checkbox from '@mui/material/Checkbox';
-import IconButton from '@mui/material/IconButton';
-import DeleteForever from '@mui/icons-material/DeleteForever';
-import AddBox from '@mui/icons-material/AddBox';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import { TextField } from '@mui/material';
-import CircularProgress from '@mui/material/CircularProgress';
+import { Box, TextField, Grid, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions, MenuItem } from "@mui/material";
+import { getSession } from "next-auth/react";
 
-export default function favorites() {
+export default function Favorites() {
 
-    const [favorites, setfavorites] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [newFavorite, setNewFavorite] = useState('');
-
-    function inputChangeHandler(e) {
-        setNewFavorite(e.target.value);
-    }
-
-    function addNewFavorite() {
-        if(newFavorite && newFavorite.length) {
-            fetch("/api/favorites", { method: "post", body: JSON.stringify({value: newFavorite, done: false}) } ).then((response) => {
-                return response.json().then((newFavorite) => {
-                    setfavorites([...favorites, newFavorite]);
-                    setNewFavorite('');
-                });
-            });
-        }
-    }
-
-    function removeFavorite({ index }) {
-        const FavoriteItem = favorites[index];
-        fetch(`/api/favorites/${FavoriteItem.id}`, { method: 'delete' }).then((res) => {
-            if (res.ok) {
-                setfavorites(favorites.filter((v,idx) => idx!==index));
-            }
-        });
-    }
-
-    function toggleDone({idx, item}) {
-        let updatedItem = {...item, done: !item.done};
-        fetch(`/api/favorites/${item.id}}`, {method: 'put', body: JSON.stringify(updatedItem)}).then((res) => {
-            if(res.ok) {
-                const updatedfavorites = [...favorites];
-                updatedfavorites[idx] = updatedItem;
-                setfavorites(updatedfavorites);
-            }
-        });
-    }
+    const [currentUser, setCurrentUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const types = [null, 'Venue', 'Entertainment', 'Catering', 'Production', 'Decoration']
 
     useEffect(() => {
-        fetch("/api/favorites", { method: "get" }).then((response) => response.ok && response.json()).then(
-            favorites => {
-                favorites && setfavorites(favorites);
-                setIsLoading(false);
+        const fetchCurrentUser = async () => {
+            const session = await getSession();
+            if (!session) {
+                setLoading(false); // Update loading state
+                return;
             }
-        );
+
+            try {
+                const response = await fetch("/api/users");
+                if (!response.ok) {
+                    throw new Error("Failed to fetch users");
+                }
+                const data = await response.json();
+                const user = data.users.find(
+                    (user) => user.email === session.user.email
+                );
+                setCurrentUser(user);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false); // Update loading state after fetching user
+            }
+        };
+
+        fetchCurrentUser();
     }, []);
 
-    const loadingItems = <CircularProgress/>;
-
-    const FavoriteItems = isLoading ? loadingItems : favorites.map((Favorite, idx) => {
-        return <ListItem key={idx} secondaryAction={
-            <IconButton edge="end" onClick={() => removeFavorite({index: idx})} aria-label='delete Favorite'><DeleteForever/></IconButton>   
-        }>  
-            <ListItemButton>
-                <ListItemIcon>
-                    <Checkbox checked={Favorite.done} disableRipple onChange={() => {
-                        toggleDone({idx, item: Favorite})
-                    }} aria-label="toggle done"/>
-                </ListItemIcon>
-                <ListItemText primary={Favorite.value}/>
-            </ListItemButton>
-        </ListItem>;
-    });
+    // Loading page...
+    if (loading) {
+        return <p>Loading...</p>;
+    }
 
     return (
         <>
-            <h2>My favorites</h2>
-            <List sx={{ width: '100%', maxWidth: 500 }}>
-                { FavoriteItems }
-                {!isLoading && <ListItem key="newItem" secondaryAction={<IconButton edge="end" onClick={addNewFavorite} aria-label="add button"><AddBox/></IconButton>}>
-                    <TextField label="New Favorite Item" fullWidth variant="outlined" value={newFavorite} onChange={inputChangeHandler}/> 
-                </ListItem>}
-            </List>
+            <h2>My Favorites</h2>
+            <Grid container spacing={3} sx={{ maxWidth: "1400px", margin: "0" }}>
+                {currentUser.favorites.map((service, index) => (
+                    <Grid item xs="auto" sm="auto" md={3} key={index}>
+                        <Box
+                            sx={{
+                                border: "1px solid #ccc",
+                                borderRadius: "8px",
+                                padding: "16px",
+                                position: "relative",
+                                cursor: "pointer",
+                            }}
+                        >
+                            {service.image ? (
+                                <img
+                                    src={`/images/vendor/${service.id}.png`}
+                                    alt={service.name}
+                                    style={{
+                                        width: "100%",
+                                        height: "250px",
+                                        objectFit: "fill",
+                                        objectPosition: "center",
+                                        marginBottom: "8px",
+                                        borderRadius: '10px'
+                                    }}
+                                />
+                            ) : (
+                                <img
+                                    src="/images/placeholder.png"
+                                    alt="Placeholder"
+                                    style={{
+                                        width: "100%",
+                                        height: "250px",
+                                        objectFit: "fill",
+                                        objectPosition: "center",
+                                        marginBottom: "8px",
+                                        borderRadius: '10px'
+                                    }}
+                                />
+                            )}
+                            <Typography variant="subtitle1" gutterBottom>
+                                Name: {service.name}
+                            </Typography>
+                            <Typography variant="body2" gutterBottom>
+                                Type: {types[service.typeID]}
+                            </Typography>
+                            <Typography variant="body2" gutterBottom>
+                                Min Price: {service.minPrice}
+                            </Typography>
+                            <Typography variant="body2" gutterBottom>
+                                Max Price: {service.maxPrice}
+                            </Typography>
+                            <Typography variant="body2" gutterBottom>
+                                Address: {service.address}
+                            </Typography>
+                            <Typography variant="body2" gutterBottom>
+                                Range: {service.range}
+                            </Typography>
+                        </Box>
+                    </Grid>
+                ))}
+            </Grid>
         </>
     );
 }

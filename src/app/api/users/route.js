@@ -7,7 +7,7 @@ import { checkLoggedIn } from "@/lib/auth";
 
 export async function POST(request) {
   const data = await request.json();
-  const { email, password, displayName, phone, role } = data;
+  const { email, password, displayName, phone, role, favorites, id } = data;
   if (email && password && displayName) {
     const hashedPassword = await bcrypt.hash(password, 10);
     let user;
@@ -53,6 +53,28 @@ export async function POST(request) {
         return NextResponse.json({ error: error.message }, { status: 500 });
       }
     }
+    if (id) {
+      let user;
+      try {
+        const existingUser = await prisma.user.findUnique({
+          where: { id },
+          include: { favorites: true }
+        });
+        const updatedFavorites = existingUser.favorites.some(service => service.id === favorites[0].id) ?
+          { disconnect: favorites.map(service => ({ id: service.id })) } :
+          { connect: favorites.map(service => ({ id: service.id })) };
+        user = await prisma.user.update({
+          where: { id },
+          data: { favorites: updatedFavorites },
+        });
+        const message = existingUser.favorites.some(service => service.id === favorites[0].id) ?
+          'Removed service from favorites' :
+          'Added service to favorites';
+        return NextResponse.json({ message });
+      } catch (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+      }
+    }
   }
   return NextResponse.json({ error: 'Email, Password, or DisplayName not defined' }, { status: 500 });
 }
@@ -60,7 +82,15 @@ export async function POST(request) {
 
 export async function GET() {
   try {
-    const users = await prisma.user.findMany();
+    const users = await prisma.user.findMany({
+      include: {
+        bookings: true,
+        reviews: true,
+        notifications: true,
+        services: true,
+        favorites: true
+      }
+    });
     return NextResponse.json({ users });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });

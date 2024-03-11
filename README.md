@@ -25,6 +25,7 @@ NEXTAUTH_SECRET="<some secret here>"
 Make sure the database is migrated. 
 
 ```bash
+npx prisma migrate reset
 npx prisma migrate dev
 ```
 

@@ -14,7 +14,7 @@ export default function Layout({ children }) {
     <html lang="en">
       <body>
         <AuthProvider>
-          <RootLayout children={children} title={COMPANY_NAME}/>        
+          <RootLayout children={children} title={COMPANY_NAME} />
         </AuthProvider>
       </body>
     </html>

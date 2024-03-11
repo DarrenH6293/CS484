@@ -14,13 +14,16 @@ import {
   DialogActions,
   MenuItem,
 } from "@mui/material";
+
 import { Block, ConstructionOutlined } from "@mui/icons-material";
+
+import IconButton from '@mui/material/IconButton';
+import ClearIcon from '@mui/icons-material/Clear';
+import { Clear } from "@mui/icons-material";
+
 
 export default function Profile() {
   const [currentUser, setCurrentUser] = useState(null);
-  const [displayName, setDisplayName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -33,6 +36,7 @@ export default function Profile() {
   const [services, setServices] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [serviceTypeID, setServiceTypeID] = useState(1);
+
   const [bookings, setBookings] = useState([]);
   const types = [
     null,
@@ -42,6 +46,10 @@ export default function Profile() {
     "Production",
     "Decoration",
   ];
+
+  const [editService, setEditService] = useState(null);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -127,6 +135,13 @@ export default function Profile() {
 
   function handleCloseDialog() {
     setOpenDialog(false);
+  }
+
+  function confirmDelete(serviceID){
+    if (confirm('Are you sure you want to delete this service?')){
+      deleteService(serviceID);
+    }
+    
   }
 
   const deleteService = async (serviceId) => {
@@ -294,7 +309,6 @@ export default function Profile() {
 
     return new Intl.DateTimeFormat("en-US", options).format(date);
   }
-  console.log(services);
   return (
     <>
       {currentUser && (
@@ -590,6 +604,7 @@ export default function Profile() {
               </Dialog>
             </>
           )}
+
         </>
       )}
       {!currentUser && <div>Sign up to see your profile info here!</div>}
