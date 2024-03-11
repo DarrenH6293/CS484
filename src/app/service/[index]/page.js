@@ -253,16 +253,3 @@ export default function Service({ params }) {
     </div>
   );
 }
-
-// model Booking {
-//     id           Int            @id @default(autoincrement())
-//     status       Boolean
-//     start        DateTime
-//     end          DateTime
-//     price        Int
-//     customer     User           @relation(fields: [customerID], references: [id])
-//     customerID   Int
-//     service      Service        @relation(fields: [serviceID], references: [id])
-//     serviceID    Int
-//     notification Notification[]
-//   }
