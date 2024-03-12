@@ -15,6 +15,8 @@ import Divider from '@mui/material/Divider';
 import Toolbar from '@mui/material/Toolbar';
 import NavBar from './NavBar';
 import Login from './Login';
+import ImageListItem from '@mui/material/ImageListItem';
+import ImageList from '@mui/material/ImageList';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Signup from './Signup';
 import { useSession, getSession } from 'next-auth/react';
@@ -22,6 +24,7 @@ import { signOut } from "next-auth/react"
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Link from 'next/link';
+import ImageListItemBar from '@mui/material/ImageListItemBar';
 
 
 const theme = createTheme({});
@@ -31,12 +34,13 @@ export default function RootLayout({ children, title }) {
   const { data: session, status } = useSession();
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState(null);
-
+  const [notifs, setNotifs] = useState([]);
   let loginSection;
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,20 +51,15 @@ export default function RootLayout({ children, title }) {
           setLoading(false); // Update loading state
           return;
         }
-        const response = await fetch("/api/users");
+        const response = await fetch("/api/Notifs");
         if (!response.ok) {
-          throw new Error("Failed to fetch users");
+          throw new Error("Failed to fetch notifications");
         }
 
-        const dataUser = await response.json();
-        const user = dataUser.users.find(
-          (dataUser) => dataUser.email === session.user.email
-        );
-        setCurrentUser(user);
-
-        // GET NOTIFICATIONS
-        // SET THEM TO THE THING
-        //DO IT
+        const notifications = await response.json();
+        setNotifs(notifications.notification)
+        
+        
       } catch (error) {
         console.error(error);
       } finally {
@@ -75,6 +74,15 @@ export default function RootLayout({ children, title }) {
     setAnchorEl(null);
   };
 
+  const handleDismiss = () => {
+    setAnchorEl(null);
+    setOpen(false);
+    let notif = filterNotifs();
+    for (let i = 0; i < notif.length; i++) {
+      notif[i].dismissed = true;
+    }
+  };
+
   const handleSignOut = async () => {
     await signOut({ callbackUrl: '/' });  // Sign out the user first
   };
@@ -85,17 +93,29 @@ export default function RootLayout({ children, title }) {
     setOpen(true);
   };
 
-
-  const handleChange = (e) => {
-    e.preventDefault();
-    setSearchInput(e.target.value);
-  };
-
   const handleClose = () => {
     setOpen(false);
   };
 
 
+  const filterNotifs = () => {
+    let filterednotifs = notifs;
+    
+    filterednotifs = filterednotifs.filter(notif => notif.userID === session.user.id &&
+      notif.dismissed === false);
+    console.log(filterednotifs);
+    return filterednotifs;
+  };
+
+  let notifClear = <span> No Notifications!</span>;
+  if (filterNotifs().length > 0) {
+    notifClear =
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+      <Button variant="outlined" color="secondary" onClick={handleDismiss}>
+        Clear Notifications
+      </Button>
+    </Box>
+  }
 
   if (status === 'authenticated') {
     loginSection = (
@@ -196,31 +216,8 @@ export default function RootLayout({ children, title }) {
         >
           {/* Filter Options */}
           <Typography variant="h6" gutterBottom>
-            Filter Options
+            Notifications
           </Typography>
-
-          {/* Divider */}
-          <Divider sx={{ my: 2 }} />
-
-
-          {/* Divider */}
-          <Divider sx={{ my: 1 }} />
-
-          {/* Price */}
-          <FormControl fullWidth sx={{ my: 1 }}>
-            <p>Price</p>
-            <Box>
-              <MinimizeIcon></MinimizeIcon>
-            </Box>
-          </FormControl>
-
-          {/* Divider */}
-          <Divider sx={{ my: 2 }} />
-
-          {/* Location */}
-          <FormControl fullWidth sx={{ my: 1 }}>
-            <p>Location</p>
-          </FormControl>
 
           {/* Close Button */}
           <IconButton
@@ -233,15 +230,26 @@ export default function RootLayout({ children, title }) {
               color: 'action.disabled',
             }}
           >
-            <CloseIcon />
+          <CloseIcon />
           </IconButton>
 
-          {/* Buttons */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
-            <Button variant="outlined" color="secondary" >
-              Clear Notifications
-            </Button>
-          </Box>
+          <ImageList id='notifs' cols={1} gap={10} sx={{ width: 1, height: 0.5, borderRadius: '10px' }}>
+            {filterNotifs().map((notif) => (
+              <ImageListItem key={notif.id}>
+                <ImageListItemBar
+                  sx={{ backgroundColor: '#F0F0F0', borderRadius: '5px 5px 5px 5px' }}
+                  title={<span style={{ padding: 5, textAlign: 'center' }}><b>{notif.title}</b></span>}
+                  subtitle={<div>
+                    <span style={{ textAlign: 'center', padding: 5 }}>{notif.description}</span><br />
+                    <span style={{ textAlign: 'center', padding: 5 }}><b>Assigned:</b> {notif.start}</span><br />
+                  </div>}
+                  position="below"
+                />
+              </ImageListItem>
+            ))}
+          </ImageList>
+
+          {notifClear}
         </Box>
       </Modal>
 
@@ -250,7 +258,10 @@ export default function RootLayout({ children, title }) {
 }
 
 /* 
-
+const notifs = notifications.notification.find(
+          (notifs) => notifs.userID === session.user.id &&
+          notifs.dismissed === false
+        );
         
 */
 /*

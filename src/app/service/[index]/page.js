@@ -122,14 +122,13 @@ export default function Service({ params }) {
           throw new Error("Failed to add booking");
         }
         const responseData = await response.json();
-
-        
+        console.log(responseData)
         newNotif = {
           title: "New Booking",
           description: "A New Booking has been requested",
           dismissed: false,
-          start: new Date().toLocaleDateString(),
-          bookingID: responseData.id,
+          start: new Date().toISOString(),
+          bookingID: responseData.booking.id,
           userID: service.vendorID
         }
 

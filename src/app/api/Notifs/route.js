@@ -20,7 +20,7 @@ export async function POST(request) {
     const { title, description, dismissed, start, bookingID, userID } =
       data;
 
-    const notif = await prisma.Booking.create({
+    const notif = await prisma.notification.create({
       data: {
         title,
         description,
