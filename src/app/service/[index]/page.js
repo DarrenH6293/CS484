@@ -12,6 +12,7 @@ export default function Service({ params }) {
     startTime: "",
     endTime: "",
     email: "",
+    price: 0,
     startDate: null,
     endDate: null,
   });
