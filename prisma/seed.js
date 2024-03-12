@@ -120,12 +120,13 @@ async function main() {
     create: {
         minPrice: 100,
         maxPrice: 1000,
-        address: '1 Grand Ave',
+        address: '1 Grand Ave, San Luis Obispo, CA 93407',
         range: 0,
         name: "Bob's Tacos",
         description: 'I sell tacos.',
         vendor: {connect: Bob},
-        type: {connect: Catering}
+        type: {connect: Catering},
+        image:'../public/images/vendor/1.png'
     },
   })
 
@@ -135,12 +136,13 @@ async function main() {
     create: {
         minPrice: 300,
         maxPrice: 2000,
-        address: '1 Boardwalk Ave',
+        address: '39145 Farwell Dr, Fremont, CA 94538',
         range: 0,
         name: "Fancy Ranch",
         description: 'Fancy Venue for Events.',
         vendor: {connect: Ben},
-        type: {connect: Venue}
+        type: {connect: Venue},
+        image:'../public/images/vendor/2.png'
     },
   })
 
@@ -150,12 +152,13 @@ async function main() {
     create: {
         minPrice: 100,
         maxPrice: 500,
-        address: '345 Jersey Ave',
+        address: '1210 S Bradley Rd, Santa Maria, CA 93454',
         range: 0,
         name: "Party Supplies",
         description: 'We have party supplies for Events.',
         vendor: {connect: Ben},
-        type: {connect: Decoration}
+        type: {connect: Decoration},
+        image:'../public/images/vendor/3.png'
     },
   })
 
@@ -165,12 +168,13 @@ async function main() {
     create: {
         minPrice: 200,
         maxPrice: 750,
-        address: '345 New York Ave',
+        address: '11966 Los Osos Valley Rd, San Luis Obispo, CA 93401',
         range: 50,
         name: "Cool Band",
         description: 'We play cool music.',
         vendor: {connect: Carl},
-        type: {connect: Entertainment}
+        type: {connect: Entertainment},
+        image:'../public/images/vendor/4.png'
     },
   })
 
@@ -180,12 +184,13 @@ async function main() {
     create: {
         minPrice: 100,
         maxPrice: 1000,
-        address: '342 Best Buy Blvd',
+        address: '1701 New Stine Rd, Bakersfield, CA 93309',
         range: 0,
         name: "Abby's Videography",
         description: 'I take pictures and Videos for events.',
         vendor: {connect: Abby},
-        type: {connect: Production}
+        type: {connect: Production},
+        image:'../public/images/vendor/5.png'
     },
   })
 

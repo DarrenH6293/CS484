@@ -48,6 +48,7 @@ export default function Home() {
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(10000);
   const [searchInput, setSearchInput] = useState("")
+  const [city, setCity] = useState('')
 
   useEffect(() => {
     async function fetchServices() {
@@ -77,6 +78,11 @@ export default function Home() {
       filteredServices = filteredServices.filter(service => 
         {const name = service.name.toLowerCase();
           return name.includes(searchInput.toLowerCase())})
+    }
+    if (city != ''){
+      filteredServices = filteredServices.filter(service => 
+      {let c = service.address.split(',')[1].toLowerCase();
+        return c.includes(city.toLowerCase())})
     }
     return filteredServices;
   };
@@ -145,7 +151,6 @@ export default function Home() {
 
         if (response.ok) {
           // Toggle favorite successful
-          alert('Service favorited/unfavorited successfully');
           const newFavorites = currentUser.favorites.some(fav => fav.id === service.id)
             ? currentUser.favorites.filter(fav => fav.id !== service.id)
             : [...currentUser.favorites, service];
@@ -169,7 +174,6 @@ export default function Home() {
   const handleOpen = () => {
     setOpen(true);
   };
-
 
   const handleChange = (e) => {
     e.preventDefault();
@@ -198,6 +202,9 @@ export default function Home() {
     setTags(resetTags);
     // Reset selected types
     setSelectedTypes([]);
+    setMinPrice(0);
+    setMaxPrice(10000);
+    setCity('');
   };
 
   return (
@@ -307,7 +314,7 @@ export default function Home() {
                 placeholder='100'
                 style={{ width: 120 }}
                 onChange={(e) => setMaxPrice(e.target.value)}
-                name="maxPirce">
+                name="maxPrice">
               </TextField>
             </Box>
           </FormControl>
@@ -317,8 +324,17 @@ export default function Home() {
 
           {/* Location */}
           <FormControl fullWidth sx={{ my: 1 }}>
-            <p>Location</p>
+            <p>City</p>
+            <TextField
+                label='City'
+                value={city}
+                style={{ width: 120 }}
+                name="city"
+                onChange={(e) => setCity(e.target.value)}
+              >
+            </TextField>
           </FormControl>
+
 
           {/* Close Button */}
           <IconButton
@@ -365,7 +381,7 @@ export default function Home() {
               />
             ) : (
               <img
-                src={`/images/vendor/${service.id}.png`}
+                src={`/images/placeholder.png`}
                 alt="Placeholder"
                 style={{
                   width: "100%",
