@@ -365,7 +365,7 @@ export default function Home() {
               />
             ) : (
               <img
-                src="/images/placeholder.png"
+                src={`/images/vendor/${service.id}.png`}
                 alt="Placeholder"
                 style={{
                   width: "100%",
