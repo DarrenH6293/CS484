@@ -328,7 +328,7 @@ export default function Home() {
             <TextField
                 label='City'
                 value={city}
-                style={{ width: 120 }}
+                fullWidth
                 name="city"
                 onChange={(e) => setCity(e.target.value)}
               >
