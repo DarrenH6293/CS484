@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import StarIcon from '@mui/icons-material/Star';
 
 export default function Service({ params }) {
   const [loading, setLoading] = useState(true);
@@ -186,16 +187,54 @@ export default function Service({ params }) {
 
   return (
     <div>
-      <p>
-        Service ID: {params.index} <br />
-        Title: {service.name}
-      </p>
-      {/* Display other service information here */}
+      <div style={{ display: "flex", alignItems: "flex-start" }}>
+        <div style={{ flex: "1", marginRight: "20px" }}>
+          <h1>{service.name}</h1>
+          {/* Display service image */}
+          <div style={{ maxWidth: "400px" }}>
+            {service.image ? (
+              <img
+                src={`/images/vendor/${service.id}.png`}
+                alt={service.name}
+                style={{
+                  width: "100%",
+                  height: "auto",
+                  objectFit: "contain",
+                  objectPosition: "left",
+                  marginBottom: "8px",
+                  borderRadius: '10px'
+                }}
+              />
+            ) : (
+              <img
+                src="/images/placeholder.png"
+                alt="Placeholder"
+                style={{
+                  width: "100%",
+                  height: "auto",
+                  objectFit: "contain",
+                  objectPosition: "left",
+                  marginBottom: "8px",
+                  borderRadius: '10px'
+                }}
+              />
+            )}
+          </div>
+          <br />
+        </div>
+        <div style={{ flex: "1", border: "1px solid #ccc", marginTop: "90px", borderRadius: "5px", padding: "10px" }}>
+          <h2>Details</h2>
+          <p>{service.description}<br />
+            Type: {service.type.name}<br />
+            Price: ${service.minPrice} - ${service.maxPrice}<br />
+            Location: {service.address}</p>
+        </div>
+      </div>
       <button onClick={handleMakeBookingClick}>Request Booking</button>
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="modal">
+        <div>
           <div className="modal-content">
             <p>Date:</p>
             <input
@@ -251,6 +290,23 @@ export default function Service({ params }) {
           </div>
         </div>
       )}
+      
+      {/* Area for Reviews */}
+      {/* Needs backend */}
+      <div style={{ marginTop: "20px" }}>
+        <h2 style={{ marginBottom: "10px" }}>Reviews 4/5<StarIcon style={{ verticalAlign: "-3.5px" }} /></h2>
+        <div style={{ border: "1px solid #ccc", borderRadius: "5px", padding: "10px" }}>
+          <div style={{ marginBottom: "10px" }}>
+            <strong>John Doe</strong>
+            <p>Review text.</p>
+          </div>
+          <div style={{ marginBottom: "10px" }}>
+            <strong>Jane Doe</strong>
+            <p>Review text.</p>
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 }
