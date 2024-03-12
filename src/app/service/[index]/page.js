@@ -76,6 +76,7 @@ export default function Service({ params }) {
 
   const handleSubmitBooking = async () => {
     let newBooking;
+    let newNotif;
     let currentUser = null;
     try {
       if (bookingInfo.startTime > bookingInfo.endTime) {
@@ -109,7 +110,6 @@ export default function Service({ params }) {
       } catch (error) {
         console.error(error);
       }
-
       try {
         const response = await fetch("/api/bookings", {
           method: "POST",
@@ -122,6 +122,29 @@ export default function Service({ params }) {
           throw new Error("Failed to add booking");
         }
         const responseData = await response.json();
+
+        
+        newNotif = {
+          title: "New Booking",
+          description: "A New Booking has been requested",
+          dismissed: false,
+          start: new Date().toLocaleDateString(),
+          bookingID: responseData.id,
+          userID: service.vendorID
+        }
+
+        const responsenotif = await fetch("/api/Notifs", {
+          method: "POST",
+          body: JSON.stringify(newNotif),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        if (!responsenotif.ok) {
+          throw new Error("Failed to add notification");
+        }
+        const responseDataNotif = await responsenotif.json();
+        
       } catch (error) {
         console.error(error);
       }

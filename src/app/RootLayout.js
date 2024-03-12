@@ -2,22 +2,25 @@
 
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
 import CssBaseline from '@mui/material/CssBaseline';
 import Container from '@mui/material/Container';
 import PersonPinCircleRoundedIcon from '@mui/icons-material/PersonPinCircleRounded';
+import { Chip, Stack, Modal, Typography, FormControl, InputLabel, Select, Button, FormGroup, FormControlLabel, Checkbox } from '@mui/material';
+
+import { useState, useEffect } from "react";
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import MinimizeIcon from '@mui/icons-material/Minimize';
+import Divider from '@mui/material/Divider';
 import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
 import NavBar from './NavBar';
 import Login from './Login';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Signup from './Signup';
-import { useSession } from 'next-auth/react';
-import { Button } from '@mui/material';
+import { useSession, getSession } from 'next-auth/react';
 import { signOut } from "next-auth/react"
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { useState } from 'react';
 import Link from 'next/link';
 
 
@@ -26,12 +29,47 @@ const theme = createTheme({});
 export default function RootLayout({ children, title }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const { data: session, status } = useSession();
+  const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState(null);
 
   let loginSection;
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const session = await getSession();
+        if (!session) {
+          setLoading(false); // Update loading state
+          return;
+        }
+        const response = await fetch("/api/users");
+        if (!response.ok) {
+          throw new Error("Failed to fetch users");
+        }
+
+        const dataUser = await response.json();
+        const user = dataUser.users.find(
+          (dataUser) => dataUser.email === session.user.email
+        );
+        setCurrentUser(user);
+
+        // GET NOTIFICATIONS
+        // SET THEM TO THE THING
+        //DO IT
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleMenuClose = () => {
     setAnchorEl(null);
@@ -40,6 +78,23 @@ export default function RootLayout({ children, title }) {
   const handleSignOut = async () => {
     await signOut({ callbackUrl: '/' });  // Sign out the user first
   };
+
+  const [open, setOpen] = useState(false);
+  
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+
+  const handleChange = (e) => {
+    e.preventDefault();
+    setSearchInput(e.target.value);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
 
 
   if (status === 'authenticated') {
@@ -68,10 +123,11 @@ export default function RootLayout({ children, title }) {
           open={Boolean(anchorEl)}
           onClose={handleMenuClose}
         >
-          <MenuItem onClick={handleMenuClose}><Link href="/profile" style={{ color: 'black', textDecoration: 'none' }}>Profile</Link></MenuItem>
-          <MenuItem onClick={handleMenuClose}><Link href="/favorites" style={{ color: 'black', textDecoration: 'none' }}>Favorites</Link></MenuItem>
-          <MenuItem onClick={handleMenuClose}><Link href="/settings" style={{ color: 'black', textDecoration: 'none' }}>Settings</Link></MenuItem>
-          <MenuItem onClick={() => { handleMenuClose(); handleSignOut(); }} style={{ color: 'black' }}>Sign Out</MenuItem>
+          <MenuItem onClick={handleMenuClose}><Button href="/profile" style={{ color: 'black', textDecoration: 'none' }}>Profile</Button></MenuItem>
+          <MenuItem onClick={handleMenuClose}><Button href="/favorites" style={{ color: 'black', textDecoration: 'none' }}>Favorites</Button></MenuItem>
+          <MenuItem onClick={handleMenuClose}><Button href="/settings" style={{ color: 'black', textDecoration: 'none' }}>Settings</Button></MenuItem>
+          <MenuItem onClick={handleMenuClose}><Button onClick={handleOpen} style={{ color: 'black', textDecoration: 'none' }}>Notifications</Button></MenuItem>
+          <MenuItem onClick={() => { handleMenuClose(); handleSignOut(); }} style={{ color: 'black' }}><Button>Sign Out</Button></MenuItem>
         </Menu>
       </>
     );
@@ -117,6 +173,138 @@ export default function RootLayout({ children, title }) {
       <Box component="main" sx={{ p: 3 }}>
         {children}
       </Box>
+      
+      {/* Filter pop-up */}
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            bgcolor: 'background.paper',
+            boxShadow: 24,
+            p: 4,
+            width: 400,
+            borderRadius: 2.5, // Rounded corners
+          }}
+        >
+          {/* Filter Options */}
+          <Typography variant="h6" gutterBottom>
+            Filter Options
+          </Typography>
+
+          {/* Divider */}
+          <Divider sx={{ my: 2 }} />
+
+
+          {/* Divider */}
+          <Divider sx={{ my: 1 }} />
+
+          {/* Price */}
+          <FormControl fullWidth sx={{ my: 1 }}>
+            <p>Price</p>
+            <Box>
+              <MinimizeIcon></MinimizeIcon>
+            </Box>
+          </FormControl>
+
+          {/* Divider */}
+          <Divider sx={{ my: 2 }} />
+
+          {/* Location */}
+          <FormControl fullWidth sx={{ my: 1 }}>
+            <p>Location</p>
+          </FormControl>
+
+          {/* Close Button */}
+          <IconButton
+            aria-label="close"
+            onClick={handleClose}
+            sx={{
+              position: 'absolute',
+              right: 0,
+              top: 0,
+              color: 'action.disabled',
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+
+          {/* Buttons */}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+            <Button variant="outlined" color="secondary" >
+              Clear Notifications
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
+
     </ThemeProvider>
   );
 }
+
+/* 
+
+        
+*/
+/*
+<ImageList id='notifs' cols={1}  sx={{ width: 1, height: 0.5, borderRadius: '10px' }}>
+        
+
+{filterServices().map((service) => (
+          <ImageListItem key={service.id}>
+            {service.image ? (
+              <img
+                src={`/images/vendor/${service.id}.png`}
+                alt={service.name}
+                style={{
+                  width: "100%",
+                  height: "250px",
+                  objectFit: "fill",
+                  objectPosition: "center",
+                  marginBottom: "8px",
+                  borderRadius: '10px'
+                }}
+              />
+            ) : (
+              <img
+                src={`/images/vendor/${service.id}.png`}
+                alt="Placeholder"
+                style={{
+                  width: "100%",
+                  height: "250px",
+                  objectFit: "fill",
+                  objectPosition: "center",
+                  marginBottom: "8px",
+                  borderRadius: '10px'
+                }}
+              />
+            )}
+            <ImageListItemBar
+              sx={{ backgroundColor: '#F0F0F0', borderRadius: '5px 5px 5px 5px' }}
+              title={<span style={{ padding: 5, textAlign: 'center' }}><b><Link href={`/service/${service.id}`}>{service.name}</Link></b></span>}
+              subtitle={<div>
+                <span style={{ textAlign: 'center', padding: 5 }}><b>Type:</b> {service.type.name}</span><br />
+                <span style={{ textAlign: 'center', padding: 5 }}><b>Price:</b> ${service.minPrice} - ${service.maxPrice}</span><br />
+                <span style={{ padding: 5, textAlign: 'center' }}><b>Location:</b> {service.address}</span>
+              </div>}
+              position="below"
+              actionIcon={currentUser && (
+                <IconButton
+                  aria-label={`favorite ${service.name}`}
+                  onClick={() => toggleFavorite(currentUser.id, service)}
+                  sx={{ color: currentUser.favorites.some(fav => fav.id === service.id) ? 'red' : 'black' }}
+                >
+                  {currentUser.favorites.some(fav => fav.id === service.id) ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                </IconButton>
+              )}
+            />
+          </ImageListItem>
+        ))}
+      </ImageList> */
