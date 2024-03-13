@@ -32,7 +32,6 @@ export default function Profile() {
   const [serviceMinPrice, setServiceMinPrice] = useState("");
   const [serviceMaxPrice, setServiceMaxPrice] = useState("");
   const [serviceAddress, setServiceAddress] = useState("");
-  const [serviceRange, setServiceRange] = useState("");
   const [services, setServices] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [serviceTypeID, setServiceTypeID] = useState(1);
@@ -178,7 +177,6 @@ export default function Profile() {
       !serviceMinPrice ||
       !serviceMaxPrice ||
       !serviceAddress ||
-      !serviceRange ||
       !selectedFile
     ) {
       setError(true);
@@ -198,7 +196,6 @@ export default function Profile() {
         minPrice: Number(serviceMinPrice),
         maxPrice: Number(serviceMaxPrice),
         address: serviceAddress,
-        range: Number(serviceRange),
         typeID: Number(serviceTypeID),
         vendorID: Number(currentUser.id),
         image: {
@@ -420,9 +417,6 @@ export default function Profile() {
                         <Typography variant="body2" gutterBottom>
                           Address: {service.address}
                         </Typography>
-                        <Typography variant="body2" gutterBottom>
-                          Range: {service.range}
-                        </Typography>
                         {/* Edit button */}
                         <Button
                           variant="contained"
@@ -569,13 +563,6 @@ export default function Profile() {
                     label="Address"
                     value={serviceAddress}
                     onChange={(e) => setServiceAddress(e.target.value)}
-                    fullWidth
-                    margin="normal"
-                  />
-                  <TextField
-                    label="Range"
-                    value={serviceRange}
-                    onChange={(e) => setServiceRange(e.target.value)}
                     fullWidth
                     margin="normal"
                   />

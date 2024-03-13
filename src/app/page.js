@@ -295,7 +295,7 @@ export default function Home() {
           <FormControl fullWidth sx={{ my: 1 }}>
             <p>Price</p>
             <Box>
-              <TextField
+              <TextField type='number'
                 InputProps={{ startAdornment: <InputAdornment position="start">$</InputAdornment> }}
                 label='Minimum Price'
                 placeholder='0'
@@ -306,7 +306,7 @@ export default function Home() {
               >
               </TextField>
               <MinimizeIcon></MinimizeIcon>
-              <TextField
+              <TextField type='number'
                 InputProps={{ startAdornment: <InputAdornment position="start">$</InputAdornment> }}
                 autoWidth
                 label="Maximum Price"
