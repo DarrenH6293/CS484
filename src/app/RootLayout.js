@@ -80,6 +80,29 @@ export default function RootLayout({ children, title }) {
     let notif = filterNotifs();
     for (let i = 0; i < notif.length; i++) {
       notif[i].dismissed = true;
+      console.log(notif[i].id)
+      postNotifs({id: notif[i].id, dismissed: true})
+    }
+  };
+
+  const postNotifs = async (data) => {
+    try {
+      const response = await fetch(`/api/Notifs`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        // Toggle favorite failed
+        console.error('Failed to update notifs');
+        alert('Failed to update notifs');
+      }
+    } catch (error) {
+      console.error('Error updating post data:', error);
+      alert('Error updating notifs');
     }
   };
 
@@ -99,6 +122,9 @@ export default function RootLayout({ children, title }) {
 
 
   const filterNotifs = () => {
+    if(session === undefined) {
+      return [];
+    }
     let filterednotifs = notifs;
     
     filterednotifs = filterednotifs.filter(notif => notif.userID === session.user.id &&
