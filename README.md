@@ -68,6 +68,6 @@ npx prisma studio
 
 ## Requirements Currently Finished
 
-6, 14, 15, 21, 23
+2, 5, 6, 7, 14, 15, 19, 21, 23
 
 
