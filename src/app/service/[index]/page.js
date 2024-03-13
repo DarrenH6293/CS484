@@ -57,7 +57,24 @@ export default function Service({ params }) {
           throw new Error("Failed to fetch reviews");
         }
         const data = await response.json();
-        setReviews(data.reviews);
+        const modifiedReviews = data.reviews.map(review => {
+          const dateObject = new Date(review.date);
+          const month = dateObject.toLocaleString('default', { month: 'short' });
+          const day = dateObject.getDate();
+          const hours = dateObject.getHours();
+          const minutes = dateObject.getMinutes();
+          const ampm = hours >= 12 ? 'PM' : 'AM';
+          const formattedHours = hours % 12 || 12; // Convert hours to 12-hour format
+          const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes; // Add leading zero if minutes < 10
+
+          return {
+            ...review,
+            date: `${month} ${day}`,
+            time: `${formattedHours}:${formattedMinutes} ${ampm}`
+          };
+        });
+
+        setReviews(modifiedReviews);
       } catch (error) {
         console.error(error);
       }
@@ -65,6 +82,8 @@ export default function Service({ params }) {
 
     fetchReviews();
   }, []);
+
+
 
   const handleMakeBookingClick = () => {
     // Open the modal
@@ -420,12 +439,13 @@ export default function Service({ params }) {
               <p>Submitting review...</p>
             ) : (
               <button onClick={handleSubmitReview}>Submit Review</button>
-            )}          <Divider sx={{ marginTop: '20px' }} /></div>)}
+            )} <Divider sx={{ marginTop: '20px' }} /> <Divider sx={{ marginTop: '10px' }} /></div>)}
 
           {reviews.map((review, index) => (
             <div key={index}>
-              <p>UserID: {review.authorID} Stars: {review.stars}</p>
+              <p>UserID: {review.authorID} Stars: {review.stars}</p><p>Date: {review.date} {review.time}</p>
               <p>Review: {review.description}</p>
+              <Divider sx={{ marginTop: '0px' }} />
             </div>
           ))}
         </div>
