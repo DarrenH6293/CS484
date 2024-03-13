@@ -48,7 +48,7 @@ export async function POST(request) {
 export async function PUT(request) {
   try {
     const data = await request.json();
-    const { id, dismissed } = data;
+    const { id, dismissed} = data;
 
     // Update the booking with the specified id
     const updated = await prisma.notification.update({
