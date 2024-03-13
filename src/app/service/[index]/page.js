@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from "react";
 import StarIcon from '@mui/icons-material/Star';
+import { getSession } from "next-auth/react";
+import Divider from '@mui/material/Divider';
 
 export default function Service({ params }) {
   const [loading, setLoading] = useState(true);
   const [service, setService] = useState(null);
   const [user, SetUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [bookingInfo, setBookingInfo] = useState({
     date: "",
@@ -19,6 +22,49 @@ export default function Service({ params }) {
   });
   const [isStartTimeValid, setIsStartTimeValid] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [review, setReview] = useState({ stars: 0, description: "" });
+  const [reviews, setReviews] = useState([]);
+
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      const session = await getSession();
+      if (!session) return;
+
+      try {
+        const response = await fetch("/api/users");
+        if (!response.ok) {
+          throw new Error("Failed to fetch users");
+        }
+        const data = await response.json();
+        const user = data.users.find(
+          (user) => user.email === session.user.email
+        );
+        setCurrentUser(user);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchCurrentUser();
+  }, []);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const response = await fetch("/api/review");
+        if (!response.ok) {
+          throw new Error("Failed to fetch reviews");
+        }
+        const data = await response.json();
+        setReviews(data.reviews);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchReviews();
+  }, []);
 
   const handleMakeBookingClick = () => {
     // Open the modal
@@ -143,7 +189,7 @@ export default function Service({ params }) {
           throw new Error("Failed to add notification");
         }
         const responseDataNotif = await responsenotif.json();
-        
+
       } catch (error) {
         console.error(error);
       }
@@ -198,6 +244,42 @@ export default function Service({ params }) {
 
     fetchService();
   }, [params.index]);
+
+  const handleReviewChange = (event) => {
+    const { name, value } = event.target;
+    setReview(prevReview => ({
+      ...prevReview,
+      [name]: value
+    }));
+  };
+
+  const handleSubmitReview = async () => {
+    const newReview = {
+      stars: Number(review.stars),
+      description: review.description,
+      authorID: Number(currentUser.id),
+      serviceID: Number(service.id),
+    };
+    try {
+      const response = await fetch("/api/review", {
+        method: "PUT",
+        body: JSON.stringify(newReview),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to add review");
+      }
+
+      setReview({
+        stars: 0,
+        description: ""
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   if (loading) {
     return <p>Loading...</p>;
@@ -312,23 +394,42 @@ export default function Service({ params }) {
           </div>
         </div>
       )}
-      
+
       {/* Area for Reviews */}
       {/* Needs backend */}
       <div style={{ marginTop: "20px" }}>
-        <h2 style={{ marginBottom: "10px" }}>Reviews 4/5<StarIcon style={{ verticalAlign: "-3.5px" }} /></h2>
+        <h2 style={{ marginBottom: "10px" }}>Reviews<StarIcon style={{ verticalAlign: "-3.5px" }} /></h2>
         <div style={{ border: "1px solid #ccc", borderRadius: "5px", padding: "10px" }}>
-          <div style={{ marginBottom: "10px" }}>
-            <strong>John Doe</strong>
-            <p>Review text.</p>
-          </div>
-          <div style={{ marginBottom: "10px" }}>
-            <strong>Jane Doe</strong>
-            <p>Review text.</p>
-          </div>
+          {currentUser && (<div><h2>Add Review</h2>
+            <p>Stars:</p>
+            <input
+              type="number"
+              name="stars"
+              value={review.stars}
+              onChange={handleReviewChange}
+            />
+
+            <p>Description:</p>
+            <textarea
+              name="description"
+              value={review.description}
+              onChange={handleReviewChange}
+            />
+
+            {isSubmitting ? (
+              <p>Submitting review...</p>
+            ) : (
+              <button onClick={handleSubmitReview}>Submit Review</button>
+            )}          <Divider sx={{ marginTop: '20px' }} /></div>)}
+
+          {reviews.map((review, index) => (
+            <div key={index}>
+              <p>UserID: {review.authorID} Stars: {review.stars}</p>
+              <p>Review: {review.description}</p>
+            </div>
+          ))}
         </div>
       </div>
-
     </div>
   );
 }
