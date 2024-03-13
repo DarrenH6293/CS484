@@ -80,7 +80,6 @@ export default function RootLayout({ children, title }) {
     let notif = filterNotifs();
     for (let i = 0; i < notif.length; i++) {
       notif[i].dismissed = true;
-      console.log(notif[i].id)
       postNotifs({id: notif[i].id, dismissed: true})
     }
   };
@@ -129,7 +128,6 @@ export default function RootLayout({ children, title }) {
     
     filterednotifs = filterednotifs.filter(notif => notif.userID === session.user.id &&
       notif.dismissed === false);
-    console.log(filterednotifs);
     return filterednotifs;
   };
 
