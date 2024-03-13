@@ -39,13 +39,17 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-Prepopulated User Logins:
-- bobjoe@mail.com | bobjoe (Vendor)
-- janedoe@mail.com | janedoe (Customer)
-- abby@mail.com  | abby (Vendor)
-- hankgreen@mail.com | hankgreen (Vendor)
-- carljr@mail.com | carljr (Vendor)
-- benten@mail.com | benten (Vendor)
+# ***Prepopulated User Logins:***
+
+| Email              | Password | Role |
+| :---------------- | :------: | ----: |
+| bobjoe@mail.com   |   bobjoe   | Vendor |
+| janedoe@mail.com   |   janedoe   | Customer |
+| abby@mail.com   |  abby   | Vendor |
+| hankgreen@mail.com |  hankgreen   | Vendor |
+| carljr@mail.com   |  carljr   | Vendor |
+| benten@mail.com |  benten   | Vendor |
+
 
 You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
 
