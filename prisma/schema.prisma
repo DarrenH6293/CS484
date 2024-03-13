@@ -39,7 +39,7 @@ model Booking {
   price            Int
   customer         User           @relation(fields: [customerID], references: [id])
   customerID       Int
-  service          Service        @relation(fields: [serviceID], references: [id])
+  service          Service        @relation(fields: [serviceID], references: [id], onDelete: Cascade)
   serviceID        Int
   notification     Notification[]
 }
@@ -50,7 +50,7 @@ model Notification {
   description String
   dismissed   Boolean
   start       DateTime @default(now())
-  booking     Booking  @relation(fields: [bookingID], references: [id])
+  booking     Booking  @relation(fields: [bookingID], references: [id], onDelete: Cascade)
   bookingID   Int
   user        User     @relation(fields: [userID], references: [id])
   userID      Int
@@ -63,7 +63,7 @@ model Review {
   date        DateTime @default(now())
   author      User     @relation(fields: [authorID], references: [id])
   authorID    Int
-  service     Service  @relation(fields: [serviceID], references: [id])
+  service     Service  @relation(fields: [serviceID], references: [id], onDelete: Cascade)
   serviceID   Int
 }
 
