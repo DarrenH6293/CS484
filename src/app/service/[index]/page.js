@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import StarIcon from '@mui/icons-material/Star';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { getSession } from "next-auth/react";
 import Divider from '@mui/material/Divider';
 
@@ -24,6 +25,9 @@ export default function Service({ params }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [review, setReview] = useState({ stars: 0, description: "" });
   const [reviews, setReviews] = useState([]);
+  const [characterCount, setCharacterCount] = useState(0);
+  const [exceedLimit, setExceedLimit] = useState(false);
+
 
 
   useEffect(() => {
@@ -75,6 +79,7 @@ export default function Service({ params }) {
         });
 
         setReviews(modifiedReviews);
+        console.log({ modifiedReviews });
       } catch (error) {
         console.error(error);
       }
@@ -83,7 +88,37 @@ export default function Service({ params }) {
     fetchReviews();
   }, []);
 
+  const StarRating = ({ rating, onRatingChange }) => {
+    const [hoverRating, setHoverRating] = useState(0);
 
+    const handleMouseEnter = (index) => {
+      setHoverRating(index);
+    };
+
+    const handleMouseLeave = () => {
+      setHoverRating(0);
+    };
+
+    const handleClick = (index) => {
+      onRatingChange(index);
+    };
+
+    return (
+      <div>
+        {[1, 2, 3, 4, 5].map((index) => (
+          <span
+            key={index}
+            style={{ cursor: 'pointer' }}
+            onMouseEnter={() => handleMouseEnter(index)}
+            onMouseLeave={handleMouseLeave}
+            onClick={() => handleClick(index)}
+          >
+            {index <= (hoverRating || rating) ? <StarIcon /> : <StarBorderIcon />}
+          </span>
+        ))}
+      </div>
+    );
+  };
 
   const handleMakeBookingClick = () => {
     // Open the modal
@@ -266,6 +301,9 @@ export default function Service({ params }) {
 
   const handleReviewChange = (event) => {
     const { name, value } = event.target;
+    const count = value.length;
+    setCharacterCount(count);
+    setExceedLimit(count > 3000);
     setReview(prevReview => ({
       ...prevReview,
       [name]: value
@@ -273,9 +311,20 @@ export default function Service({ params }) {
   };
 
   const handleSubmitReview = async () => {
+    const descriptionLength = review.description.trim().length;
+
+    // Check if the description length exceeds the limit
+    if (descriptionLength > 3000) {
+      console.error("Review exceeds the character limit of 3000");
+      return;
+    }
+
+    const currentDate = new Date().toISOString();
     const newReview = {
       stars: Number(review.stars),
       description: review.description,
+      date: currentDate,
+      author: currentUser,
       authorID: Number(currentUser.id),
       serviceID: Number(service.id),
     };
@@ -290,6 +339,17 @@ export default function Service({ params }) {
       if (!response.ok) {
         throw new Error("Failed to add review");
       }
+      const dateObject = new Date(newReview.date);
+      const month = dateObject.toLocaleString("default", { month: "short" });
+      const day = dateObject.getDate();
+      const hours = dateObject.getHours();
+      const minutes = dateObject.getMinutes();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const formattedHours = hours % 12 || 12; // Convert hours to 12-hour format
+      const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes; // Add leading zero if minutes < 10
+      newReview.date = `${month} ${day}`;
+      newReview.time = `${formattedHours}:${formattedMinutes} ${ampm}`;
+      setReviews([...reviews, newReview]);
 
       setReview({
         stars: 0,
@@ -298,6 +358,13 @@ export default function Service({ params }) {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const calculateOverallRating = () => {
+    if (reviews.length === 0) return 0;
+
+    const totalStars = reviews.reduce((acc, curr) => acc + curr.stars, 0);
+    return totalStars / reviews.length;
   };
 
   if (loading) {
@@ -345,12 +412,33 @@ export default function Service({ params }) {
           </div>
           <br />
         </div>
-        <div style={{ flex: "1", border: "1px solid #ccc", marginTop: "90px", borderRadius: "5px", padding: "10px" }}>
-          <h2>Details</h2>
-          <p>{service.description}<br />
-            Type: {service.type.name}<br />
-            Price: ${service.minPrice} - ${service.maxPrice}<br />
-            Location: {service.address}</p>
+        <div style={{ flex: "1", border: "1px solid #ccc", marginTop: "90px", borderRadius: "5px", padding: "1px", marginLeft: "20px", display: "flex" }}>
+          <div style={{ flex: "1", marginRight: "10px" }}>
+            <div style={{ marginBottom: "10px", marginLeft: "10px" }}>
+              <h2>About this Service</h2>
+              <p style={{ wordWrap: 'break-word' }}>{service.description}</p>
+            </div>
+            <div>
+              <Divider orientation="horizontal" flexItem style={{ marginLeft: "10px" }} />
+              <h2 style={{ marginLeft: "10px" }}>Service Information</h2>
+              <p style={{ marginLeft: "10px", wordWrap: 'break-word' }}>
+                Type: {service.type.name}<br />
+                Price: ${service.minPrice} - ${service.maxPrice}<br />
+                Location: {service.address}
+              </p>
+            </div>
+          </div>
+          <Divider orientation="vertical" flexItem />
+          <div style={{ flex: "1" }}>
+            <div style={{ marginBottom: "10px", marginLeft: "10px" }}>
+              <h2>Vendor Information</h2>
+              <p style={{ wordWrap: 'break-word' }}>
+                Vendor: {service.vendor.displayName}<br />
+                Phone: {service.vendor.phone}<br />
+                Email: {service.vendor.email}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
       <button onClick={handleMakeBookingClick}>Request Booking</button>
@@ -415,37 +503,51 @@ export default function Service({ params }) {
       )}
 
       {/* Area for Reviews */}
-      {/* Needs backend */}
       <div style={{ marginTop: "20px" }}>
-        <h2 style={{ marginBottom: "10px" }}>Reviews<StarIcon style={{ verticalAlign: "-3.5px" }} /></h2>
+        <h2 style={{ marginBottom: "10px" }}>Reviews: {calculateOverallRating().toFixed(1)} <StarIcon style={{ verticalAlign: "-3.5px" }} /></h2>
         <div style={{ border: "1px solid #ccc", borderRadius: "5px", padding: "10px" }}>
-          {currentUser && (<div><h2>Add Review</h2>
-            <p>Stars:</p>
-            <input
-              type="number"
-              name="stars"
-              value={review.stars}
-              onChange={handleReviewChange}
-            />
+          {currentUser && (
+            <div>
+              <h2>Add Review</h2>
+              <p>Rating:</p>
+              <StarRating
+                rating={review.stars}
+                onRatingChange={stars => setReview(prevReview => ({ ...prevReview, stars }))}
+              />
+              <p>Review:</p>
+              <textarea
+                style={{ width: "100%", height: "200px" }}
+                name="description"
+                value={review.description}
+                onChange={handleReviewChange}
+              />
+              {isSubmitting ? (
+                <p>Submitting review...</p>
+              ) : (
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <button onClick={handleSubmitReview} style={{ marginRight: "10px" }}>Submit Review</button>
+                  <p style={{ fontSize: "10px" }}>{characterCount} / 3000 characters left</p>
+                  {exceedLimit && <p style={{ color: "red", marginLeft: "10px", fontSize: "10px" }}>Character limit exceeded!</p>}
+                </div>
+              )}
+              <Divider sx={{ marginTop: '20px' }} />
+              <Divider sx={{ marginTop: '10px' }} />
+            </div>
+          )}
 
-            <p>Description:</p>
-            <textarea
-              name="description"
-              value={review.description}
-              onChange={handleReviewChange}
-            />
-
-            {isSubmitting ? (
-              <p>Submitting review...</p>
-            ) : (
-              <button onClick={handleSubmitReview}>Submit Review</button>
-            )} <Divider sx={{ marginTop: '20px' }} /> <Divider sx={{ marginTop: '10px' }} /></div>)}
-
-          {reviews.map((review, index) => (
+          {reviews && reviews.map((review, index) => (
             <div key={index}>
-              <p>UserID: {review.authorID} Stars: {review.stars}</p><p>Date: {review.date} {review.time}</p>
-              <p>Review: {review.description}</p>
-              <Divider sx={{ marginTop: '0px' }} />
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div>
+                  <p><strong>User:</strong> {review.author.displayName}</p>
+                  <p></p>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <p><strong>{review.stars} <StarIcon style={{ verticalAlign: "-5.5px" }} /> - </strong> {review.date}, {review.time}</p>
+                </div>
+              </div>
+              <p style={{ wordWrap: 'break-word' }}><strong>Review:</strong> {review.description}</p>
+              <Divider sx={{ marginTop: '10px' }} />
             </div>
           ))}
         </div>

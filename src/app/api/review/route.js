@@ -3,7 +3,11 @@ import prisma from "@/lib/db";
 
 export async function GET() {
     try {
-        const reviews = await prisma.review.findMany();
+        const reviews = await prisma.review.findMany({
+            include: {
+                author: true
+            }
+        });
         return NextResponse.json({ reviews });
     } catch (error) {
         return NextResponse.json(
@@ -15,7 +19,7 @@ export async function GET() {
 export async function PUT(request) {
     try {
         const data = await request.json();
-        const { stars, description, date, authorID, serviceID } =
+        const { stars, description, date, author, authorID, serviceID } =
             data;
 
         const notif = await prisma.Review.create({
@@ -23,6 +27,7 @@ export async function PUT(request) {
                 stars,
                 description,
                 date,
+                author,
                 author: {
                     connect: { id: authorID },
                 },
