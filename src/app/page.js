@@ -219,7 +219,7 @@ export default function Home() {
         }}>
           <InputBase
             sx={{ ml: 1, flex: 1, justifyContent: 'center' }}
-            placeholder="Search for vendors..."
+            placeholder="Search for services..."
             onChange={handleChange}
             value={searchInput}
           />
