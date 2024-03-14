@@ -7,7 +7,8 @@ export async function GET() {
   try {
     const services = await prisma.service.findMany({
       include: {
-        type: true // Include the related type object
+        type: true,
+        vendor: true
       }
     });
     return NextResponse.json({ services });
