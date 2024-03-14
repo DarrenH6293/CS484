@@ -5,6 +5,10 @@ import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { getSession } from "next-auth/react";
 import Divider from '@mui/material/Divider';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import { IconButton } from '@mui/material';
+
 
 export default function Service({ params }) {
   const [loading, setLoading] = useState(true);
@@ -79,7 +83,6 @@ export default function Service({ params }) {
         });
 
         setReviews(modifiedReviews);
-        console.log({ modifiedReviews });
       } catch (error) {
         console.error(error);
       }
@@ -118,6 +121,40 @@ export default function Service({ params }) {
         ))}
       </div>
     );
+  };
+
+  const toggleFavorite = async (userId, service) => {
+    try {
+      const updateFavoriteData = { id: userId, favorites: [service] };
+      try {
+        const response = await fetch(`/api/users`, {
+          method: 'POST',
+          body: JSON.stringify(updateFavoriteData),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          // Toggle favorite successful
+          const newFavorites = currentUser.favorites.some(fav => fav.id === service.id)
+            ? currentUser.favorites.filter(fav => fav.id !== service.id)
+            : [...currentUser.favorites, service];
+          const updatedUser = { ...currentUser, favorites: newFavorites };
+          setCurrentUser(updatedUser);
+        } else {
+          // Toggle favorite failed
+          console.error('Failed to toggle favorite');
+          alert('Failed to toggle favorite');
+        }
+      } catch (error) {
+        console.error('Error toggling favorite:', error);
+        alert('Error toggling favorite');
+      }
+    } catch (error) {
+      console.error('Error preparing favorite data:', error);
+      alert('Error preparing favorite data');
+    }
   };
 
   const handleMakeBookingClick = () => {
@@ -313,7 +350,6 @@ export default function Service({ params }) {
   const handleSubmitReview = async () => {
     const descriptionLength = review.description.trim().length;
 
-    // Check if the description length exceeds the limit
     if (descriptionLength > 3000) {
       console.error("Review exceeds the character limit of 3000");
       return;
@@ -361,10 +397,13 @@ export default function Service({ params }) {
   };
 
   const calculateOverallRating = () => {
-    if (reviews.length === 0) return 0;
+    const serviceReviews = reviews.filter(review => review.serviceID === service.id);
 
-    const totalStars = reviews.reduce((acc, curr) => acc + curr.stars, 0);
-    return totalStars / reviews.length;
+    if (serviceReviews.length === 0) return 0;
+
+    const totalStars = serviceReviews.reduce((acc, curr) => acc + curr.stars, 0);
+
+    return totalStars / serviceReviews.length;
   };
 
   if (loading) {
@@ -379,7 +418,15 @@ export default function Service({ params }) {
     <div>
       <div style={{ display: "flex", alignItems: "flex-start" }}>
         <div style={{ flex: "1", marginRight: "20px" }}>
-          <h1>{service.name}</h1>
+          <h1>{service.name} {currentUser && (
+            <IconButton
+              aria-label={`favorite ${service.name}`}
+              onClick={() => toggleFavorite(currentUser.id, service)}
+              sx={{ color: currentUser.favorites.some(fav => fav.id === service.id) ? 'red' : 'black' }}
+            >
+              {currentUser.favorites.some(fav => fav.id === service.id) ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+            </IconButton>
+          )}</h1>
           {/* Display service image */}
           <div style={{ maxWidth: "400px" }}>
             {service.image ? (
@@ -535,21 +582,26 @@ export default function Service({ params }) {
             </div>
           )}
 
-          {reviews && reviews.map((review, index) => (
-            <div key={index}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <div>
-                  <p><strong>User:</strong> {review.author.displayName}</p>
-                  <p></p>
+          {reviews && reviews
+            .filter(review => review.serviceID === service.id)
+            .map((review, index) => (
+              <div key={index}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <div>
+                    <p><strong>User:</strong> {review.author.displayName}</p>
+                    <p></p>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <p><strong>{review.stars} <StarIcon style={{ verticalAlign: "-5.5px" }} /> - </strong> {review.date}, {review.time}</p>
+                  </div>
                 </div>
-                <div style={{ textAlign: 'right' }}>
-                  <p><strong>{review.stars} <StarIcon style={{ verticalAlign: "-5.5px" }} /> - </strong> {review.date}, {review.time}</p>
-                </div>
+                <p style={{ wordWrap: 'break-word' }}><strong>Review:</strong> {review.description}</p>
+                <Divider sx={{ marginTop: '10px' }} />
               </div>
-              <p style={{ wordWrap: 'break-word' }}><strong>Review:</strong> {review.description}</p>
-              <Divider sx={{ marginTop: '10px' }} />
-            </div>
-          ))}
+            ))}
+          {reviews && reviews.filter(review => review.serviceID === service.id).length === 0 && (
+            <p>This service has no reviews so far.</p>
+          )}
         </div>
       </div>
     </div>
