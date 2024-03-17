@@ -153,7 +153,7 @@ export default function Profile() {
     <>
       {currentUser && (
         <>
-          <h2>User Type: {currentUser.role}</h2>
+          <h2 style={{ fontFamily: 'Verdana, sans-serif'}}>User Type: {currentUser.role}</h2>
           <div style={{ display: "grid", gap: "10px", marginBottom: "20px" }}>
             <div
               style={{
@@ -162,13 +162,13 @@ export default function Profile() {
                 alignItems: "center",
               }}
             >
-              <label htmlFor="displayName">Display Name:</label>
+              <label style={{ fontFamily: 'Georgia, sans-serif'}} htmlFor="displayName">Display Name:</label>
               <input
                 type="text"
                 id="displayName"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                style={{ maxWidth: "150px" }}
+                style={{ fontFamily: 'Georgia, sans-serif', maxWidth: "150px" }}
               />
             </div>
             <div
@@ -178,13 +178,13 @@ export default function Profile() {
                 alignItems: "center",
               }}
             >
-              <label htmlFor="email">Email:</label>
+              <label style={{ fontFamily: 'Georgia, sans-serif'}} htmlFor="email">Email:</label>
               <input
                 type="text"
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                style={{ maxWidth: "150px" }}
+                style={{ fontFamily: 'Georgia, sans-serif', maxWidth: "150px" }}
               />
             </div>
             <div
@@ -194,16 +194,16 @@ export default function Profile() {
                 alignItems: "center",
               }}
             >
-              <label htmlFor="phone">Phone:</label>
+              <label style={{ fontFamily: 'Georgia, sans-serif'}} htmlFor="phone">Phone:</label>
               <input
                 type="text"
                 id="phone"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                style={{ maxWidth: "150px" }}
+                style={{ fontFamily: 'Georgia, sans-serif', maxWidth: "150px" }}
               />
             </div>
-            <button onClick={handleUpdate} style={{ justifySelf: "start" }}>
+            <button onClick={handleUpdate} style={{ fontFamily: 'Georgia, sans-serif', justifySelf: "start" }}>
               Update Info
             </button>
           </div>
