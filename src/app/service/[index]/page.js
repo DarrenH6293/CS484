@@ -418,7 +418,7 @@ export default function Service({ params }) {
     <div>
       <div style={{ display: "flex", alignItems: "flex-start" }}>
         <div style={{ flex: "1", marginRight: "20px" }}>
-          <h1>{service.name} {currentUser && (
+          <h1 style={{ fontFamily: 'Verdana, sans-serif'}}>{service.name} {currentUser && (
             <IconButton
               aria-label={`favorite ${service.name}`}
               onClick={() => toggleFavorite(currentUser.id, service)}
@@ -462,13 +462,13 @@ export default function Service({ params }) {
         <div style={{ flex: "1", border: "1px solid #ccc", marginTop: "90px", borderRadius: "5px", padding: "1px", marginLeft: "20px", display: "flex" }}>
           <div style={{ flex: "1", marginRight: "10px" }}>
             <div style={{ marginBottom: "10px", marginLeft: "10px" }}>
-              <h2>About this Service</h2>
-              <p style={{ wordWrap: 'break-word' }}>{service.description}</p>
+              <h2 style={{ fontFamily: 'Verdana, sans-serif'}}>About This Service</h2>
+              <p style={{ fontFamily: 'Verdana, sans-serif', wordWrap: 'break-word' }}>{service.description}</p>
             </div>
             <div>
               <Divider orientation="horizontal" flexItem style={{ marginLeft: "10px" }} />
-              <h2 style={{ marginLeft: "10px" }}>Service Information</h2>
-              <p style={{ marginLeft: "10px", wordWrap: 'break-word' }}>
+              <h2 style={{ fontFamily: 'Verdana, sans-serif', marginLeft: "10px" }}>Service Information</h2>
+              <p style={{ fontFamily: 'Verdana, sans-serif', marginLeft: "10px", wordWrap: 'break-word' }}>
                 Type: {service.type.name}<br />
                 Price: ${service.minPrice} - ${service.maxPrice}<br />
                 Location: {service.address}
@@ -478,8 +478,8 @@ export default function Service({ params }) {
           <Divider orientation="vertical" flexItem />
           <div style={{ flex: "1" }}>
             <div style={{ marginBottom: "10px", marginLeft: "10px" }}>
-              <h2>Vendor Information</h2>
-              <p style={{ wordWrap: 'break-word' }}>
+              <h2 style={{ fontFamily: 'Verdana, sans-serif'}}>Vendor Information</h2>
+              <p style={{ fontFamily: 'Verdana, sans-serif', wordWrap: 'break-word' }}>
                 Vendor: {service.vendor.displayName}<br />
                 Phone: {service.vendor.phone}<br />
                 Email: {service.vendor.email}
