@@ -72,7 +72,6 @@ model Service {
   minPrice    Int
   maxPrice    Int
   address     String
-  range       Int
   description String
   name        String
   image       String?
