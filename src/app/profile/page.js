@@ -26,6 +26,7 @@ export default function Profile() {
   const [currentUser, setCurrentUser] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [error, setError] = useState(false);
+  const [errorMessages, setErrorMessages] = useState({});
   const [loading, setLoading] = useState(true);
   const [serviceName, setServiceName] = useState("");
   const [serviceDescription, setServiceDescription] = useState("");
@@ -46,7 +47,13 @@ export default function Profile() {
     "Decoration",
   ];
 
-  const [editService, setEditService] = useState(null);
+  const [editServiceData, setEditServiceData] = useState({
+    name: "",
+    description: "",
+    minPrice: "",
+    maxPrice: "",
+    address: "",
+  });
   const [openEditDialog, setOpenEditDialog] = useState(false);
 
 
@@ -136,12 +143,50 @@ export default function Profile() {
     setOpenDialog(false);
   }
 
-  function confirmDelete(serviceID){
-    if (confirm('Are you sure you want to delete this service?')){
+  function confirmDelete(serviceID) {
+    if (confirm('Are you sure you want to delete this service?')) {
       deleteService(serviceID);
     }
-    
+
   }
+
+  function validateServiceData(service) {
+    const errors = {};
+
+    if (!service.name || service.name.length > 30) {
+      errors.name = "Service name must be between 1 and 30 characters";
+    }
+
+    if (!service.description || service.description.length > 2000) {
+      errors.description = "Description must be between 1 and 2000 characters";
+    }
+
+    if (!service.minPrice || isNaN(service.minPrice) || service.minPrice < 0 || service.minPrice > 1000000) {
+      errors.minPrice = "Minimum price must be a number between 0 and 1000000";
+    }
+
+    if (!service.maxPrice || isNaN(service.maxPrice) || service.maxPrice < 0 || service.maxPrice > 1000000) {
+      errors.maxPrice = "Maximum price must be a number between 0 and 1000000";
+    }
+
+    if (service.minPrice >= service.maxPrice) {
+      errors.maxPrice = "Maximum price must be greater than minimum price";
+    }
+
+    if (!service.address || service.address.length > 100) {
+      errors.address = "Address must be between 1 and 100 characters";
+    }
+
+    return errors;
+  }
+
+  const handleShowErrorDialog = (errors) => {
+    let message = "";
+    for (const key in errors) {
+      message += `${errors[key]}\n`;
+    }
+    alert(message);
+  };
 
   const deleteService = async (serviceId) => {
     try {
@@ -180,6 +225,7 @@ export default function Profile() {
       !selectedFile
     ) {
       setError(true);
+      alert("Image required");
       return;
     }
 
@@ -202,6 +248,13 @@ export default function Profile() {
           data: base64data,
         },
       };
+
+      const errors = validateServiceData(newService);
+
+      if (Object.keys(errors).length > 0) {
+        handleShowErrorDialog(errors);
+        return;
+      }
 
       try {
         const response = await fetch("/api/servicesProfile", {
@@ -231,6 +284,73 @@ export default function Profile() {
       setOpenDialog(false);
     };
   }
+
+
+  const handleEditService = (service) => {
+    // Set the edit service data with the details of the service to be edited
+    setEditServiceData({
+      id: service.id,
+      name: service.name,
+      description: service.description,
+      minPrice: service.minPrice.toString(),
+      maxPrice: service.maxPrice.toString(),
+      address: service.address,
+    });
+    setOpenEditDialog(true);
+  };
+
+  const handleCloseEditDialog = () => {
+    setOpenEditDialog(false);
+  };
+
+  const handleUpdateService = async () => {
+    try {
+      const updatedService = {
+        id: editServiceData.id,
+        name: editServiceData.name,
+        description: editServiceData.description,
+        minPrice: Number(editServiceData.minPrice),
+        maxPrice: Number(editServiceData.maxPrice),
+        address: editServiceData.address,
+      };
+
+      const errors = validateServiceData(updatedService);
+
+      if (Object.keys(errors).length > 0) {
+        handleShowErrorDialog(errors);
+        return;
+      }
+
+      setErrorMessages({});
+
+      const response = await fetch(`/api/servicesProfile`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedService),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update service");
+      }
+
+      const responseData = await response.json();
+
+      setServices(prevServices =>
+        prevServices.map(service =>
+          service.id === responseData.service.id ? responseData.service : service
+        )
+      );
+
+      setOpenEditDialog(false);
+    } catch (error) {
+      console.error("Error updating service:", error);
+    }
+  };
+
+
+
   const handleReject = async (booking) => {
     try {
       const data = { id: booking.id, status: false, hasBeenConfirmed: true };
@@ -336,19 +456,17 @@ export default function Profile() {
                       className="booking"
                       key={index}
                     >
-                      <h3>{`Service Name: ${
-                        services.find((s) => s.id === booking.serviceID)?.name
-                      }`}</h3>
+                      <h3>{`Service Name: ${services.find((s) => s.id === booking.serviceID)?.name
+                        }`}</h3>
                       <p>{`Start Date: ${formatDate(booking.start)}`}</p>
                       <p>{`End Date: ${formatDate(booking.end)}`}</p>
                       <p>{`Proposed Price: ${booking.price}`}</p>
-                      <p>{`Status: ${
-                        booking.hasBeenConfirmed === false
-                          ? "Pending"
-                          : booking.status
+                      <p>{`Status: ${booking.hasBeenConfirmed === false
+                        ? "Pending"
+                        : booking.status
                           ? "Accepted"
                           : "Rejected"
-                      }`}</p>
+                        }`}</p>
                     </div>
                   </div>
                 ))}
@@ -430,12 +548,60 @@ export default function Profile() {
                         >
                           Edit
                         </Button>
-                        <IconButton aria-label="delete" color="warning" 
+                        <Dialog open={openEditDialog} onClose={handleCloseEditDialog}>
+                          <DialogTitle>Edit Service</DialogTitle>
+                          <DialogContent>
+                            <TextField
+                              label="Service Name"
+                              value={editServiceData.name}
+                              onChange={(e) => setEditServiceData({ ...editServiceData, name: e.target.value })}
+                              fullWidth
+                              margin="normal"
+                            />
+                            <TextField
+                              label="Description"
+                              value={editServiceData.description}
+                              onChange={(e) => setEditServiceData({ ...editServiceData, description: e.target.value })}
+                              fullWidth
+                              margin="normal"
+                              multiline
+                              rows={4}
+                            />
+                            <TextField
+                              label="Minimum Price"
+                              value={editServiceData.minPrice}
+                              onChange={(e) => setEditServiceData({ ...editServiceData, minPrice: e.target.value })}
+                              fullWidth
+                              margin="normal"
+                            />
+                            <TextField
+                              label="Maximum Price"
+                              value={editServiceData.maxPrice}
+                              onChange={(e) => setEditServiceData({ ...editServiceData, maxPrice: e.target.value })}
+                              fullWidth
+                              margin="normal"
+                            />
+                            <TextField
+                              label="Address"
+                              value={editServiceData.address}
+                              onChange={(e) => setEditServiceData({ ...editServiceData, address: e.target.value })}
+                              fullWidth
+                              margin="normal"
+                            />
+                          </DialogContent>
+                          <DialogActions>
+                            <Button onClick={handleCloseEditDialog}>Cancel</Button>
+                            <Button onClick={handleUpdateService} color="primary">
+                              Update
+                            </Button>
+                          </DialogActions>
+                        </Dialog>
+                        <IconButton aria-label="delete" color="warning"
                           sx={{
-                              position: "absolute",
-                              top: "8px", // Adjust this value for vertical positioning
-                              right: "8px", // Adjust this value for horizontal positioning
-                            }}
+                            position: "absolute",
+                            top: "8px", // Adjust this value for vertical positioning
+                            right: "8px", // Adjust this value for horizontal positioning
+                          }}
                           onClick={() => confirmDelete(service.id)}>
                           <ClearIcon></ClearIcon>
                         </IconButton>
@@ -474,19 +640,17 @@ export default function Profile() {
               {bookings &&
                 bookings.map((booking, index) => (
                   <div className="booking" key={index}>
-                    <h3>{`Service Name: ${
-                      services.find((s) => s.id === booking.serviceID)?.name
-                    }`}</h3>
+                    <h3>{`Service Name: ${services.find((s) => s.id === booking.serviceID)?.name
+                      }`}</h3>
                     <p>{`Start Date: ${formatDate(booking.start)}`}</p>
                     <p>{`End Date: ${formatDate(booking.end)}`}</p>
                     <p>{`Proposed Price: ${booking.price}`}</p>
-                    <p>{`Status: ${
-                      booking.hasBeenConfirmed === false
-                        ? "Pending"
-                        : booking.status
+                    <p>{`Status: ${booking.hasBeenConfirmed === false
+                      ? "Pending"
+                      : booking.status
                         ? "Accepted"
                         : "Rejected"
-                    }`}</p>
+                      }`}</p>
 
                     {booking.hasBeenConfirmed == false && (
                       <>

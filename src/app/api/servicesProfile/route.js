@@ -24,59 +24,75 @@ export async function POST(request) {
     const data = await request.json();
 
     const {
+      id,
       name,
       description,
       minPrice,
       maxPrice,
       address,
-      range,
       typeID,
       vendorID,
       image,
     } = data;
 
-    // Create service without image first
-    const newService = await prisma.Service.create({
-      data: {
-        minPrice,
-        maxPrice,
-        address,
-        range,
-        description,
-        name,
-        vendor: {
-          connect: { id: vendorID },
+    if (id) {
+      // Update existing service
+      const updatedService = await prisma.Service.update({
+        where: { id },
+        data: {
+          name,
+          description,
+          minPrice,
+          maxPrice,
+          address,
         },
-        type: {
-          connect: { id: typeID },
-        },
-      },
-    });
-
-    if (image && image.data) {
-      const buffer = Buffer.from(image.data, 'base64');
-      const fileName = `${newService.id}.png`;
-      const filePath = path.join(process.cwd(), 'public', 'images', 'vendor', fileName);
-
-      await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
-      await fs.promises.writeFile(filePath, buffer);
-
-      // Update the service with the image path
-      await prisma.Service.update({
-        where: { id: newService.id },
-        data: { image: filePath },
       });
-    }
 
-    return NextResponse.json({ status: 200, service: newService });
+      return NextResponse.json({ status: 200, service: updatedService });
+    } else {
+      // Create new service
+      const newService = await prisma.Service.create({
+        data: {
+          minPrice,
+          maxPrice,
+          address,
+          description,
+          name,
+          vendor: {
+            connect: { id: vendorID },
+          },
+          type: {
+            connect: { id: typeID },
+          },
+        },
+      });
+
+      if (image && image.data) {
+        const buffer = Buffer.from(image.data, 'base64');
+        const fileName = `${newService.id}.png`;
+        const filePath = path.join(process.cwd(), 'public', 'images', 'vendor', fileName);
+
+        await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
+        await fs.promises.writeFile(filePath, buffer);
+
+        // Update the service with the image path
+        await prisma.Service.update({
+          where: { id: newService.id },
+          data: { image: filePath },
+        });
+      }
+
+      return NextResponse.json({ status: 200, service: newService });
+    }
   } catch (error) {
-    console.error("Error creating service:", error);
+    console.error("Error creating/updating service:", error);
     return NextResponse.json(
       { status: 500 },
       { body: { message: "Internal Server Error" } }
     );
   }
 }
+
 
 export async function DELETE(request) {
   const data = await request.json();
