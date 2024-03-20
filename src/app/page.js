@@ -50,6 +50,32 @@ export default function Home() {
   const [searchInput, setSearchInput] = useState("")
   const [city, setCity] = useState('')
 
+  
+  const re = /^[0-9\b]+$/;
+
+  const handleNumbers = (event,p) => {
+    let num = event.target.value
+    if (!re.test(event.target.value)) {
+      event.preventDefault();
+    }
+    else if (p == 'min'){
+      if(num > maxPrice){
+        alert('Min Price cannot be greater than Max Price');
+        event.preventDefault();
+      }
+      else
+        setMinPrice(event.target.value)
+    }
+    else{
+      if(num < minPrice){
+        alert('Min Price cannot be greater than Max Price');
+        event.preventDefault();
+      }
+      else
+        setMaxPrice(event.target.value)
+    }
+  }
+
   useEffect(() => {
     async function fetchServices() {
       try {
@@ -302,18 +328,17 @@ export default function Home() {
                 value={minPrice}
                 style={{ width: 120 }}
                 name="minPrice"
-                onChange={(e) => setMinPrice(e.target.value)}
+                onChange={(e) => handleNumbers(e, 'min')}
               >
               </TextField>
               <MinimizeIcon></MinimizeIcon>
               <TextField type='number'
                 InputProps={{ startAdornment: <InputAdornment position="start">$</InputAdornment> }}
-                autoWidth
                 label="Maximum Price"
                 value={maxPrice}
                 placeholder='100'
                 style={{ width: 120 }}
-                onChange={(e) => setMaxPrice(e.target.value)}
+                onChange={(e) => handleNumbers(e, 'max')}
                 name="maxPrice">
               </TextField>
             </Box>
