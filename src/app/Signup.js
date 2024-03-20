@@ -16,6 +16,8 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { signIn } from 'next-auth/react';
 import Alert from '@mui/material/Alert';
+import { styled } from '@mui/system';
+
 
 export default function Signup() {
   const [open, setOpen] = useState(false);
@@ -36,6 +38,21 @@ export default function Signup() {
   const handleRole = (event) => {
     setRole(event.target.value);
   };
+
+  const StyledInput= styled(TextField)`
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    display: none;
+  }`;
+  
+  const re = /^[0-9\b]+$/;
+
+  const handleNumbers = (event) => {
+    event.target.value = Math.max(0, parseInt(event.target.value) ).toString().slice(0,10)
+    if (!re.test(event.target.value)) {
+      event.preventDefault();
+    }
+  }
 
   function handleSignup(event) {
     event.preventDefault();
@@ -117,16 +134,18 @@ export default function Signup() {
               required
               error={formState.displayName?.error}
             />
-            <TextField
+            <StyledInput
               autoFocus
               margin="dense"
               id="phone"
               name="phone"
               label="Phone"
-              type="phone"
               fullWidth
               variant="standard"
               required
+              type='number'
+              inputProps={{ maxLength: 10 }}
+              onChange={handleNumbers}
               error={formState.phone?.error}
             />
             <TextField

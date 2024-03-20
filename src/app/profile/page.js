@@ -176,6 +176,9 @@ export default function Profile() {
     if (!service.address || service.address.length > 100) {
       errors.address = "Address must be between 1 and 100 characters";
     }
+    if(service.address.split(',').length < 2){
+      errors.address = 'Please input a valid address: 123 Something Ave, City, State ZipCode';
+    }
 
     return errors;
   }
