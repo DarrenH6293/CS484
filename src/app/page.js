@@ -46,7 +46,7 @@ export default function Home() {
   const [services, setServices] = useState([]);
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(10000);
+  const [maxPrice, setMaxPrice] = useState(1000000);
   const [searchInput, setSearchInput] = useState("")
   const [city, setCity] = useState('')
 
