@@ -172,7 +172,6 @@ export default function Service({ params }) {
       date: "",
       startTime: "",
       endTime: "",
-      email: "",
       price: 0,
       startDate: null, // New state for start date
       endDate: null, // New state for end date
@@ -209,31 +208,20 @@ export default function Service({ params }) {
     setBookingInfo((prevInfo) => ({ ...prevInfo, endTime, endDate }));
   };
 
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    setBookingInfo({
-      date: value,
-      startTime: "",
-      endTime: "",
-      email: "",
-      price: 0,
-      startDate: null, // New state for start date
-      endDate: null, // New state for end date
-    });
-  };
-
   const handleSubmitBooking = async () => {
     let newBooking;
     let newNotif;
-    let currentUser = null;
+    const { date, startTime, endTime, price } = bookingInfo;
+    if (!/^\d{1,999999}$/.test(price) || Number(price) > 999999 || Number(price) < 1) {
+      window.alert("Invalid Price.");
+      return;
+    }
     try {
       if (bookingInfo.startTime > bookingInfo.endTime) {
         setIsStartTimeValid(false);
         return;
       }
       setCurrentTime(new Date());
-      console.log(currentTime);
-      console.log(bookingInfo);
       if (currentTime > bookingInfo.startDate) {
         window.alert("Invalid Time");
         return;
@@ -241,15 +229,6 @@ export default function Service({ params }) {
       // Assuming you have an API endpoint for submitting bookings
 
       try {
-        const response = await fetch("/api/users");
-        if (!response.ok) {
-          throw new Error("Failed to fetch users");
-        }
-        const data = await response.json();
-        currentUser = data.users.find(
-          (user) => user.email === bookingInfo.email
-        );
-
         if (currentUser == null || currentUser.role == "VENDOR") {
           return;
         }
@@ -277,7 +256,6 @@ export default function Service({ params }) {
           throw new Error("Failed to add booking");
         }
         const responseData = await response.json();
-        console.log(responseData)
         newNotif = {
           title: "New Booking",
           description: "A New Booking has been requested",
@@ -313,8 +291,6 @@ export default function Service({ params }) {
         window.alert("Need to input a date.");
         return;
       } else if (currentUser == null || currentUser.role == "VENDOR") {
-        console.log("IN HERE");
-        console.log(currentUser);
         window.alert("Invalid customer email.");
         return;
       }
@@ -517,7 +493,7 @@ export default function Service({ params }) {
               type="date"
               name="date"
               value={bookingInfo.date}
-              onChange={handleInputChange}
+              onChange={(e) => setBookingInfo({ ...bookingInfo, date: e.target.value })}
             />
 
             <p>Start Time:</p>
@@ -536,19 +512,12 @@ export default function Service({ params }) {
               onChange={handleEndTimeChange}
             />
 
-            <p>Email:</p>
-            <input
-              type="text"
-              name="email"
-              value={bookingInfo.email}
-              onChange={handleInputChange}
-            />
             <p>Proposed Price:</p>
             <input
               type="number"
               name="price"
               value={bookingInfo.price}
-              onChange={handleInputChange}
+              onChange={(e) => setBookingInfo({ ...bookingInfo, price: e.target.value })}
             />
 
             {!isStartTimeValid && (
