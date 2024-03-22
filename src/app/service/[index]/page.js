@@ -226,7 +226,6 @@ export default function Service({ params }) {
         window.alert("Invalid Time");
         return;
       }
-      // Assuming you have an API endpoint for submitting bookings
 
       try {
         if (currentUser == null || currentUser.role == "VENDOR") {
