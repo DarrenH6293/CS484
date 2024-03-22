@@ -118,9 +118,9 @@ export default function Profile() {
         return;
       }
   
-      if (!/^\d{0,12}$/.test(phone)) {
+      if (!/^\d{10,11}$/.test(phone)) {
         setError(true);
-        alert("Phone number must contain only numbers and be 12 characters or less.");
+        alert("Phone number must contain only numbers and be 10-11 characters.");
         return;
       }
   
