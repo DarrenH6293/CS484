@@ -176,7 +176,7 @@ export default function Profile() {
     if (!service.address || service.address.length > 100) {
       errors.address = "Address must be between 1 and 100 characters";
     }
-    if(service.address.split(',').length < 2){
+    if (service.address.split(',').length < 2) {
       errors.address = 'Please input a valid address: 123 Something Ave, City, State ZipCode';
     }
 
@@ -193,27 +193,22 @@ export default function Profile() {
 
   const deleteService = async (serviceId) => {
     try {
+      setServices((prevServices) =>
+        prevServices.filter((service) => service.id !== serviceId)
+      );
+
+      // Send a request to delete the service from the server
       const response = await fetch(`/api/servicesProfile`, {
         method: "DELETE",
         body: JSON.stringify({ id: serviceId }),
       });
 
-      const responseData = await response.json();
-
-      if (response.ok) {
-        if (responseData.status === 200) {
-          // Update services state after deletion
-          setServices((prevServices) =>
-            prevServices.filter((service) => service.id !== serviceId)
-          );
-        } else {
-          throw new Error("Failed to delete service");
-        }
-      } else {
+      if (!response.ok) {
         throw new Error("Failed to delete service");
       }
     } catch (error) {
       console.error("Error deleting service:", error);
+      fetchData(); // Refetch the data to revert UI state
     }
   };
 
