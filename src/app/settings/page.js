@@ -102,6 +102,7 @@ export default function Profile() {
     } else {
       // Missing input fields or passwords don't match
       setError(true);
+      alert("Passwords don't match");
     }
   }
 
@@ -153,8 +154,8 @@ export default function Profile() {
         setError(true);
       }
     } else {
-      // Missing input fields
       setError(true);
+      alert("Missing input fields.");
     }
   }
 
