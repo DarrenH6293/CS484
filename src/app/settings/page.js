@@ -112,7 +112,44 @@ export default function Profile() {
 
     // Validate input fields
     if (email && displayName && phone) {
+      if (displayName.length > 50) {
+        setError(true);
+        alert("Display name must be 50 characters or less.");
+        return;
+      }
+  
+      if (!/^\d{0,12}$/.test(phone)) {
+        setError(true);
+        alert("Phone number must contain only numbers and be 12 characters or less.");
+        return;
+      }
+  
+      if (email.length > 50) {
+        setError(true);
+        alert("Email must be 50 characters or less.");
+        return;
+      }
+
+      try {
+        const res = await fetch("/api/users");
+        if (!res.ok) {
+          throw new Error("Failed to fetch users");
+        }
+        const d = await res.json();
+        const eUser = d.users.find(user => user.email === email);
+        if (eUser && eUser.id !== currentUser.id) {
+          // If the email already exists and belongs to a different user, show an error
+          setError(true);
+          alert("Email already exists. Please choose a different one.");
+          return;
+        }
+      } catch (error) {
+        console.error("Error updating profile:", error);
+        setError(true);
+      }
+
       const updateUserData = {
+        id: currentUser.id,
         email: email,
         displayName: displayName,
         phone: phone,
