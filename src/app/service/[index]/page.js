@@ -31,6 +31,8 @@ export default function Service({ params }) {
   const [reviews, setReviews] = useState([]);
   const [characterCount, setCharacterCount] = useState(0);
   const [exceedLimit, setExceedLimit] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  
 
 
 
@@ -180,6 +182,7 @@ export default function Service({ params }) {
     setIsSubmitting(false);
   };
 
+
   const handleStartTimeChange = (event) => {
     const startTime = event.target.value;
     if (bookingInfo.date == "") {
@@ -208,7 +211,15 @@ export default function Service({ params }) {
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setBookingInfo((prevInfo) => ({ ...prevInfo, [name]: value }));
+    setBookingInfo({
+      date: value,
+      startTime: "",
+      endTime: "",
+      email: "",
+      price: 0,
+      startDate: null, // New state for start date
+      endDate: null, // New state for end date
+    });
   };
 
   const handleSubmitBooking = async () => {
@@ -218,6 +229,13 @@ export default function Service({ params }) {
     try {
       if (bookingInfo.startTime > bookingInfo.endTime) {
         setIsStartTimeValid(false);
+        return;
+      }
+      setCurrentTime(new Date());
+      console.log(currentTime);
+      console.log(bookingInfo);
+      if (currentTime > bookingInfo.startDate) {
+        window.alert("Invalid Time");
         return;
       }
       // Assuming you have an API endpoint for submitting bookings
