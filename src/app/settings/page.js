@@ -14,7 +14,6 @@ import {
 export default function Profile() {
   const [currentUser, setCurrentUser] = useState(null);
   const [displayName, setDisplayName] = useState("");
-  const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [newPassword, setNewPassword] = useState("");
@@ -42,7 +41,6 @@ export default function Profile() {
         );
         setCurrentUser(user);
         setDisplayName(user.displayName);
-        setEmail(user.email);
         setPhone(user.phone);
       } catch (error) {
         console.error(error);
@@ -111,46 +109,21 @@ export default function Profile() {
     event.preventDefault();
 
     // Validate input fields
-    if (email && displayName && phone) {
+    if (displayName && phone) {
       if (displayName.length > 50) {
         setError(true);
         alert("Display name must be 50 characters or less.");
         return;
       }
-  
+
       if (!/^\d{10,11}$/.test(phone)) {
         setError(true);
         alert("Phone number must contain only numbers and be 10-11 characters.");
         return;
       }
-  
-      if (email.length > 50) {
-        setError(true);
-        alert("Email must be 50 characters or less.");
-        return;
-      }
-
-      try {
-        const res = await fetch("/api/users");
-        if (!res.ok) {
-          throw new Error("Failed to fetch users");
-        }
-        const d = await res.json();
-        const eUser = d.users.find(user => user.email === email);
-        if (eUser && eUser.id !== currentUser.id) {
-          // If the email already exists and belongs to a different user, show an error
-          setError(true);
-          alert("Email already exists. Please choose a different one.");
-          return;
-        }
-      } catch (error) {
-        console.error("Error updating profile:", error);
-        setError(true);
-      }
 
       const updateUserData = {
         id: currentUser.id,
-        email: email,
         displayName: displayName,
         phone: phone,
       };
@@ -169,7 +142,6 @@ export default function Profile() {
           alert("Profile updated successfully");
           handleCloseDialog();
           setDisplayName(updateUserData.displayName);
-          setEmail(updateUserData.email);
           setPhone(updateUserData.phone);
         } else {
           // Profile update failed
@@ -190,7 +162,7 @@ export default function Profile() {
     <>
       {currentUser && (
         <>
-          <h2 style={{ fontFamily: 'Verdana, sans-serif'}}>User Type: {currentUser.role}</h2>
+          <h2 style={{ fontFamily: 'Verdana, sans-serif' }}>User Type: {currentUser.role}</h2>
           <div style={{ display: "grid", gap: "10px", marginBottom: "20px" }}>
             <div
               style={{
@@ -199,7 +171,7 @@ export default function Profile() {
                 alignItems: "center",
               }}
             >
-              <label style={{ fontFamily: 'Georgia, sans-serif'}} htmlFor="displayName">Display Name:</label>
+              <label style={{ fontFamily: 'Georgia, sans-serif' }} htmlFor="displayName">Display Name:</label>
               <input
                 type="text"
                 id="displayName"
@@ -215,14 +187,6 @@ export default function Profile() {
                 alignItems: "center",
               }}
             >
-              <label style={{ fontFamily: 'Georgia, sans-serif'}} htmlFor="email">Email:</label>
-              <input
-                type="text"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                style={{ fontFamily: 'Georgia, sans-serif', maxWidth: "150px" }}
-              />
             </div>
             <div
               style={{
@@ -231,7 +195,7 @@ export default function Profile() {
                 alignItems: "center",
               }}
             >
-              <label style={{ fontFamily: 'Georgia, sans-serif'}} htmlFor="phone">Phone:</label>
+              <label style={{ fontFamily: 'Georgia, sans-serif' }} htmlFor="phone">Phone:</label>
               <input
                 type="text"
                 id="phone"
