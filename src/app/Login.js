@@ -34,9 +34,16 @@ export default function Login() {
   }
 
   function handleSignin() {
-    signIn("normal", { ...formValues, redirect: true, callbackUrl: '/' })
+    signIn("normal", {...formValues, redirect: false}).then((result) => {
+      if (!result.error) {
+        setOpen(false);
+        reset();
+      } else {
+        setError(true);
+      }
+    })
   }
-
+  
   function handleChange({ field, value }) {
     setFormValues({ ...formValues, [field]: value });
   }
