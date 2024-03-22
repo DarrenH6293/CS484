@@ -290,9 +290,11 @@ export default function Service({ params }) {
       } else if (bookingInfo.date == "") {
         window.alert("Need to input a date.");
         return;
-      } else if (currentUser == null || currentUser.role == "VENDOR") {
+      } else if (currentUser == null) {
         window.alert("Invalid customer email.");
         return;
+      } else if (currentUser.role == "VENDOR"){
+        window.alert("You may not request a booking if you are a vendor.");
       }
       setIsSubmitting(true);
       // Update UI as needed
