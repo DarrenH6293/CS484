@@ -41,12 +41,12 @@ export async function POST(request) {
         return NextResponse.json({ error: error.message }, { status: 500 });
       }
     }
-    if (email && displayName && phone) {
+    if (id && displayName && phone) {
       let user;
       try {
         user = await prisma.user.update({
-          where: { email },
-          data: { email: email, displayName: displayName, phone: phone },
+          where: { id },
+          data: { displayName: displayName, phone: phone },
         });
         return NextResponse.json({ message: 'Profile updated successfully' });
       } catch (error) {
