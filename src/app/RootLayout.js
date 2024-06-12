@@ -4,7 +4,6 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import Container from '@mui/material/Container';
-import PersonPinCircleRoundedIcon from '@mui/icons-material/PersonPinCircleRounded';
 import { Chip, Stack, Modal, Typography, FormControl, InputLabel, Select, Button, FormGroup, FormControlLabel, Checkbox } from '@mui/material';
 
 import { useState, useEffect } from "react";
@@ -148,16 +147,18 @@ export default function RootLayout({ children, title }) {
           variant="outlined"
           color="inherit"
           onClick={handleMenuOpen}
-          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+          style={{ display: 'flex', justifyContent: 'space-between', borderColor: 'black', alignItems: 'center' }}
         >
-          <span>My Account</span>
+          <span style={{ color: 'black' }}>My Account</span>
           <img
             src="/images/default_pfp.webp"
+            variant="outlined"
             style={{
               width: '25px',
               height: '25px',
               borderRadius: '50%',
-              marginLeft: '8px' // Apply border-radius to make it a circle
+              marginLeft: '8px', // Apply border-radius to make it a circle
+              border: '1px solid black'
             }}
             alt="Profile"
           />
@@ -183,10 +184,15 @@ export default function RootLayout({ children, title }) {
     <ThemeProvider theme={theme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
-        <AppBar position="static">
+        <AppBar position="static"  sx={{ backgroundColor: '#F7F9F9' }}>
           <Container maxWidth="xl">
             <Toolbar disableGutters>
-              <PersonPinCircleRoundedIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+              <Box
+                component="img"
+                src="./images/logo.png"
+                sx={{ display: { xs: 'none', md: 'flex' }, mr: 1, height: '50px', width: '50px' }}
+                alt="Your Alt Text"
+              />
               <Typography
                 variant="h6"
                 noWrap
@@ -196,9 +202,10 @@ export default function RootLayout({ children, title }) {
                   mr: 2,
                   display: { xs: 'none', md: 'flex' },
                   fontFamily: 'monospace',
+                  fontSize: 40,
                   fontWeight: 700,
                   letterSpacing: '.3rem',
-                  color: 'inherit',
+                  color: 'black',
                   textDecoration: 'none',
                 }}
               >

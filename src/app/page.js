@@ -236,7 +236,7 @@ export default function Home() {
   return (
     <>
       <Box sx={{
-        position: 'relative', backgroundImage: `url(https://images.unsplash.com/photo-1554228422-b8d4e6b3fa1e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MTd8fHxlbnwwfHx8fHw%3D)`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center',
+        position: 'relative', backgroundImage: `url(./images/000-1068x534.jpg)`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center',
         display: 'flex', width: 1, alignContent: 'center', alignItems: 'center', justifyContent: 'center', height: 300, margin: 0, zIndex: 0
       }}>
         <Box sx={{
@@ -245,7 +245,7 @@ export default function Home() {
         }}>
           <InputBase
             sx={{ ml: 1, flex: 1, justifyContent: 'center' }}
-            placeholder="Search for services..."
+            placeholder="   Search for services..."
             onChange={handleChange}
             value={searchInput}
           />
@@ -399,7 +399,7 @@ export default function Home() {
                   fontFamily: "Georgia, sans-serif",
                   width: "100%",
                   height: "250px",
-                  objectFit: "fill",
+                  objectFit: "fit",
                   objectPosition: "center",
                   marginBottom: "8px",
                   borderRadius: '10px'
