@@ -412,7 +412,7 @@ export default function Service({ params }) {
   return (
     <div>
       <div style={{ display: "flex", alignItems: "flex-start" }}>
-        <div style={{ flex: "1", marginRight: "20px" }}>
+        <div style={{ flex: "1", marginRight: "20px", marginTop: 30}}>
           <h1 style={{ fontFamily: 'Verdana, sans-serif'}}>{service.name} {currentUser && (
             <IconButton
               aria-label={`favorite ${service.name}`}

@@ -184,7 +184,7 @@ export default function RootLayout({ children, title }) {
     <ThemeProvider theme={theme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
-        <AppBar position="static" sx={{ backgroundColor: '#F7F9F9' }}>
+        <AppBar position="fixed" sx={{ backgroundColor: '#F7F9F9'}}>
           <Container maxWidth="x2" sx={{ padding: 0, marginRight: 0, marginLeft: 0 }}>
             <Toolbar disableGutters sx={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>

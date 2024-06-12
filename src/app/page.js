@@ -23,6 +23,7 @@ import { NextResponse } from 'next/server';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { getSession } from "next-auth/react";
+import StarIcon from '@mui/icons-material/Star';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -50,6 +51,7 @@ export default function Home() {
   const [maxPrice, setMaxPrice] = useState(1000000);
   const [searchInput, setSearchInput] = useState("")
   const [city, setCity] = useState('')
+  const [reviews, setReviews] = useState([]);
 
   
   const re = /^[0-9\b]+$/;
@@ -93,6 +95,40 @@ export default function Home() {
     }
 
     fetchServices();
+  }, []);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const response = await fetch("/api/review");
+        if (!response.ok) {
+          throw new Error("Failed to fetch reviews");
+        }
+        const data = await response.json();
+        const modifiedReviews = data.reviews.map(review => {
+          const dateObject = new Date(review.date);
+          const month = dateObject.toLocaleString('default', { month: 'short' });
+          const day = dateObject.getDate();
+          const hours = dateObject.getHours();
+          const minutes = dateObject.getMinutes();
+          const ampm = hours >= 12 ? 'PM' : 'AM';
+          const formattedHours = hours % 12 || 12; // Convert hours to 12-hour format
+          const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes; // Add leading zero if minutes < 10
+
+          return {
+            ...review,
+            date: `${month} ${day}`,
+            time: `${formattedHours}:${formattedMinutes} ${ampm}`
+          };
+        });
+
+        setReviews(modifiedReviews);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchReviews();
   }, []);
 
   const filterServices = () => {
@@ -234,11 +270,21 @@ export default function Home() {
     setCity('');
   };
 
+  const calculateOverallRating = (service) => {
+    const serviceReviews = reviews.filter(review => review.serviceID === service.id);
+
+    if (serviceReviews.length === 0) return 0;
+
+    const totalStars = serviceReviews.reduce((acc, curr) => acc + curr.stars, 0);
+
+    return totalStars / serviceReviews.length;
+  };
+
   return (
     <>
       <Box sx={{
         position: 'relative', backgroundImage: `url(./images/000-1068x534.jpg)`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center',
-        display: 'flex', width: 1, alignContent: 'center', alignItems: 'center', justifyContent: 'center', height: 300, margin: 0, zIndex: 0
+        display: 'flex', width: 1, alignContent: 'center', alignItems: 'center', justifyContent: 'center', height: 300, margin: 0, zIndex: 0, marginTop: 10
       }}>
         <Box sx={{
           display: 'flex', alignItems: 'center', alignContent: 'center', justifyContent: "center", borderRadius: 50, borderColor: 'gray',
@@ -255,13 +301,21 @@ export default function Home() {
             <TuneIcon />
           </IconButton>
         </Box>
-        <Stack direction="row" spacing={1} sx={{
+        <Stack direction="row" spacing={5} sx={{
           position: 'absolute', display: 'flex', alignItems: 'center', alignContent: 'center', justifyContent: 'center',
-          top: 185, overflowX: 'auto', color: 'white', padding: '10px'
+          top: 185, overflowX: 'auto', color: 'white', padding: '30px'
         }}>
           {tags.map((tag) => (
-            <Chip key={tag.key} label={<span style={{ color: 'white' }}>{tag.label}</span>} color='info' onClick={() => handleTagClick(tag.key)}
-              variant={tag.selected ? 'filled' : 'outlined'} />
+            <Chip key={tag.key} label={<span style={{ color: 'black' }}>{tag.label}</span>} color='info' onClick={() => handleTagClick(tag.key)} sx={{
+            backgroundColor: tag.selected ? '#63D2FF' : 'white',
+            color: 'black',
+            borderColor: 'black',
+            borderWidth: '1px',
+            borderStyle: 'solid',
+            '&:hover': {
+              backgroundColor: tag.selected? '#63D2FF' : '#BED9D4',
+            },
+          }} />
           ))}
         </Stack>
       </Box>
@@ -390,58 +444,79 @@ export default function Home() {
 
 
       <ImageList id='services' cols={4} gap={10} sx={{ width: 1, height: 0.5, borderRadius: '10px' }}>
-        {filterServices().map((service) => (
-          <ImageListItem key={service.id}>
-            {service.image ? (
-              <img
-                src={`/images/vendor/${service.id}.png`}
-                alt={service.name}
-                style={{
-                  fontFamily: "Georgia, sans-serif",
-                  width: "100%",
-                  height: "250px",
-                  objectFit: "fit",
-                  objectPosition: "center",
-                  marginBottom: "8px",
-                  borderRadius: '10px'
-                }}
-              />
-            ) : (
-              <img
-                src={`/images/placeholder.png`}
-                alt="Placeholder"
-                style={{
-                  width: "100%",
-                  height: "250px",
-                  objectFit: "fill",
-                  objectPosition: "center",
-                  marginBottom: "8px",
-                  borderRadius: '10px'
-                }}
-              />
-            )}
-            <ImageListItemBar
-              sx={{ backgroundColor: '#F0F0F0', borderRadius: '5px 5px 5px 5px' }}
-              title={<span style={{ fontFamily: "Arial-Black, sans-serif", padding: 5, textAlign: 'center' }}><b><Link href={`/service/${service.id}`}>{service.name}</Link></b></span>}
-              subtitle={<div>
-                <span style={{ fontFamily: "Georgia, sans-serif", textAlign: 'center', padding: 5 }}><b>Type:</b> {service.type.name}</span><br />
-                <span style={{ fontFamily: "Georgia, sans-serif", textAlign: 'center', padding: 5 }}><b>Price:</b> ${service.minPrice} - ${service.maxPrice}</span><br />
-                <span style={{ fontFamily: "Georgia, sans-serif", padding: 5, textAlign: 'center' }}><b>Location:</b> {service.address}</span>
-              </div>}
-              position="below"
-              actionIcon={currentUser && (
-                <IconButton
-                  aria-label={`favorite ${service.name}`}
-                  onClick={() => toggleFavorite(currentUser.id, service)}
-                  sx={{ color: currentUser.favorites.some(fav => fav.id === service.id) ? 'red' : 'black' }}
-                >
-                  {currentUser.favorites.some(fav => fav.id === service.id) ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-                </IconButton>
-              )}
+      {filterServices().map((service) => (
+        <ImageListItem key={service.id} sx={{ position: 'relative' }}>
+          {service.image ? (
+            <img
+              src={`/images/vendor/${service.id}.png`}
+              alt={service.name}
+              style={{
+                fontFamily: "Georgia, sans-serif",
+                width: "100%",
+                height: "250px",
+                objectFit: "fit",
+                objectPosition: "center",
+                marginBottom: "8px",
+                borderRadius: '10px'
+              }}
             />
-          </ImageListItem>
-        ))}
-      </ImageList>
+          ) : (
+            <img
+              src={`/images/placeholder.png`}
+              alt="Placeholder"
+              style={{
+                width: "100%",
+                height: "250px",
+                objectFit: "fill",
+                objectPosition: "center",
+                marginBottom: "8px",
+                borderRadius: '10px'
+              }}
+            />
+          )}
+          {currentUser && (
+            <IconButton
+              aria-label={`favorite ${service.name}`}
+              onClick={() => toggleFavorite(currentUser.id, service)}
+              sx={{
+                position: 'absolute',
+                top: '2.5px',
+                right: '2.5px',
+                color: currentUser.favorites.some(fav => fav.id === service.id) ? 'red' : 'black'
+              }}
+            >
+              {currentUser.favorites.some(fav => fav.id === service.id) ? (
+                <FavoriteIcon sx={{ color: 'red' }} />
+              ) : (
+                <FavoriteIcon sx={{ color: 'white', stroke: 'black', strokeWidth: 2 }} />
+              )}
+            </IconButton>
+          )}
+          <ImageListItemBar
+            sx={{ backgroundColor: '#F0F0F0', borderRadius: '5px 5px 5px 5px' }}
+            title={
+              <span style={{ fontFamily: "Arial-Black, sans-serif", padding: 5, textAlign: 'center', fontSize: 20 }}>
+                <b><Link href={`/service/${service.id}`}>{service.name}</Link></b>
+              </span>
+            }
+            subtitle={
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Box>
+                  <span style={{ fontFamily: "Georgia, sans-serif", textAlign: 'center', padding: 5, fontSize: 15 }}><b>Type:</b> {service.type.name}</span><br />
+                  <span style={{ fontFamily: "Georgia, sans-serif", textAlign: 'center', padding: 5, fontSize: 15}}><b>Price:</b> ${service.minPrice} - ${service.maxPrice}</span><br />
+                  <span style={{ fontFamily: "Georgia, sans-serif", padding: 5, textAlign: 'center', fontSize: 15 }}><b>Location:</b> {service.address}</span>
+                </Box>
+                <Box sx={{ position: 'absolute', top: '5px', right: '10px', display: 'flex', alignItems: 'center' }}>
+                  <StarIcon sx={{ verticalAlign: 'middle', color: '#FFD700', stroke: 'black', strokeWdith: 2 }} />
+                  <span style={{ fontFamily: "Georgia, sans-serif", paddingLeft: 5, fontSize: 20 }}>{calculateOverallRating(service).toFixed(1)} ({reviews.filter(review => review.serviceID === service.id).length})</span>
+                </Box>
+              </Box>
+            }
+            position="below"
+          />
+        </ImageListItem>
+      ))}
+    </ImageList>
     </>
   )
 }
