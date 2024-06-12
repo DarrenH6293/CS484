@@ -736,11 +736,12 @@ export default function Profile() {
                     fullWidth
                     margin="normal"
                   >
-                    <MenuItem value={1}>Venue</MenuItem>
-                    <MenuItem value={2}>Entertainment</MenuItem>
-                    <MenuItem value={3}>Catering</MenuItem>
-                    <MenuItem value={4}>Production</MenuItem>
-                    <MenuItem value={5}>Decoration</MenuItem>
+                    <MenuItem value={1}>Plumbing</MenuItem>
+                    <MenuItem value={2}>Lawn Care</MenuItem>
+                    <MenuItem value={3}>Electrical</MenuItem>
+                    <MenuItem value={4}>Roofing</MenuItem>
+                    <MenuItem value={5}>Pest Control</MenuItem>
+                    <MenuItem value={6}>Cleaning</MenuItem>
                   </TextField>
                 </DialogContent>
                 <DialogActions>

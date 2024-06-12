@@ -54,16 +54,18 @@ export default function Login() {
         variant="outlined"
         color="inherit"
         onClick={handleLoginButton}
-        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+        style={{ display: 'flex', justifyContent: 'space-between', borderColor: 'black', alignItems: 'center' }}
       >
-        <span>Login / Sign-Up</span>
+        <span style={{ color: 'black' }}>Login / Sign-Up</span>
         <img
           src="/images/default_pfp.webp"
+          variant="outlined"
           style={{
             width: '25px',
             height: '25px',
             borderRadius: '50%',
-            marginLeft: '8px' // Apply border-radius to make it a circle
+            marginLeft: '8px',
+            border: '1px solid black' // Apply border-radius to make it a circle
           }}
           alt="Profile"
         />

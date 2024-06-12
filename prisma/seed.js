@@ -2,43 +2,51 @@ const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 
 async function main() {
-  const Venue = await prisma.type.upsert({
+  const Plumbing = await prisma.type.upsert({
     where: { id: 1 },
     update: {},
     create: {
-        name: "Venue"
+        name: "Plumbing"
     },
   })
 
-  const Entertainment = await prisma.type.upsert({
+  const Lawncare = await prisma.type.upsert({
     where: { id: 2 },
     update: {},
     create: {
-        name: "Entertainment"
+        name: "Lawncare"
     },
   })
 
-  const Catering = await prisma.type.upsert({
+  const Electrical = await prisma.type.upsert({
     where: { id: 3 },
     update: {},
     create: {
-        name: "Catering"
+        name: "Electrical"
     },
   })
 
-  const Production = await prisma.type.upsert({
+  const Roofing = await prisma.type.upsert({
     where: { id: 4 },
     update: {},
     create: {
-        name: "Production"
+        name: "Roofing"
     },
   })
 
-  const Decoration = await prisma.type.upsert({
+  const Pest_Control = await prisma.type.upsert({
     where: { id: 5 },
     update: {},
     create: {
-        name: "Decoration"
+        name: "Pest Control"
+    },
+  })
+
+  const Cleaning = await prisma.type.upsert({
+    where: { id: 5 },
+    update: {},
+    create: {
+        name: "Cleaning"
     },
   })
 
@@ -114,77 +122,77 @@ async function main() {
     },
   })
 
-  const Food = await prisma.service.upsert({
+  const Cleaner = await prisma.service.upsert({
     where: { id: 1 },
     update: {},
     create: {
         minPrice: 100,
         maxPrice: 1000,
         address: '1 Grand Ave, San Luis Obispo, CA 93407',
-        name: "Bob's Tacos",
-        description: 'I sell tacos.',
+        name: "Sparkle Cleaners",
+        description: 'Cleaning services.',
         vendor: {connect: Bob},
-        type: {connect: Catering},
+        type: {connect: Cleaning},
         image:'../public/images/vendor/1.png'
     },
   })
 
-  const Ranch = await prisma.service.upsert({
+  const Plumber = await prisma.service.upsert({
     where: { id: 2 },
     update: {},
     create: {
         minPrice: 300,
         maxPrice: 2000,
         address: '39145 Farwell Dr, Fremont, CA 94538',
-        name: "Fancy Ranch",
-        description: 'Fancy Venue for Events.',
+        name: "Plumb Perfect",
+        description: 'Plumbing service.',
         vendor: {connect: Ben},
-        type: {connect: Venue},
+        type: {connect: Plumbing},
         image:'../public/images/vendor/2.png'
     },
   })
 
-  const Party = await prisma.service.upsert({
+  const Mower = await prisma.service.upsert({
     where: { id: 3 },
     update: {},
     create: {
         minPrice: 100,
         maxPrice: 500,
         address: '1210 S Bradley Rd, Santa Maria, CA 93454',
-        name: "Party Supplies",
-        description: 'We have party supplies for Events.',
+        name: "Lavsival Lawn Care",
+        description: 'Lawn Services.',
         vendor: {connect: Ben},
-        type: {connect: Decoration},
+        type: {connect: Lawncare},
         image:'../public/images/vendor/3.png'
     },
   })
 
-  const Band = await prisma.service.upsert({
+  const Roofer = await prisma.service.upsert({
     where: { id: 4 },
     update: {},
     create: {
         minPrice: 200,
         maxPrice: 750,
         address: '11966 Los Osos Valley Rd, San Luis Obispo, CA 93401',
-        name: "Cool Band",
-        description: 'We play cool music.',
+        name: "Roof Rescuers",
+        description: 'Repair roofs.',
         vendor: {connect: Carl},
-        type: {connect: Entertainment},
+        type: {connect: Roofing},
         image:'../public/images/vendor/4.png'
     },
   })
 
-  const Video = await prisma.service.upsert({
+  const Remover = await prisma.service.upsert({
     where: { id: 5 },
     update: {},
     create: {
         minPrice: 100,
         maxPrice: 1000,
         address: '1701 New Stine Rd, Bakersfield, CA 93309',
-        name: "Abby's Videography",
-        description: 'I take pictures and Videos for events.',
+        name: "Pestt Remover's",
+        description: 'Remove pests.',
         vendor: {connect: Abby},
-        type: {connect: Production},
+        type: {connect: Pest_Control},
         image:'../public/images/vendor/5.png'
     },
   })

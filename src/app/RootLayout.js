@@ -184,36 +184,36 @@ export default function RootLayout({ children, title }) {
     <ThemeProvider theme={theme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
-        <AppBar position="static"  sx={{ backgroundColor: '#F7F9F9' }}>
-          <Container maxWidth="xl">
-            <Toolbar disableGutters>
-              <Box
-                component="img"
-                src="./images/logo.png"
-                sx={{ display: { xs: 'none', md: 'flex' }, mr: 1, height: '50px', width: '50px' }}
-                alt="Your Alt Text"
-              />
-              <Typography
-                variant="h6"
-                noWrap
-                component="a"
-                href="/"
-                sx={{
-                  mr: 2,
-                  display: { xs: 'none', md: 'flex' },
-                  fontFamily: 'monospace',
-                  fontSize: 40,
-                  fontWeight: 700,
-                  letterSpacing: '.3rem',
-                  color: 'black',
-                  textDecoration: 'none',
-                }}
-              >
-                {title}
-              </Typography>
-              <NavBar />
-              <Box sx={{ flexGrow: 0 }}>
-                <Stack direction='row' spacing={2}>
+        <AppBar position="static" sx={{ backgroundColor: '#F7F9F9' }}>
+          <Container maxWidth="x2" sx={{ padding: 0, marginRight: 0, marginLeft: 0 }}>
+            <Toolbar disableGutters sx={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Box
+                  component="img"
+                  src="./images/logo.png"
+                  sx={{ display: { xs: 'none', md: 'flex' }, mr: 1, height: '50px', width: '50px' }}
+                  alt="Your Alt Text"
+                />
+                <Typography
+                  variant="h6"
+                  noWrap
+                  component="a"
+                  href="/"
+                  sx={{
+                    display: { xs: 'none', md: 'flex' },
+                    fontFamily: 'monospace',
+                    fontSize: 40,
+                    fontWeight: 700,
+                    letterSpacing: '.3rem',
+                    color: 'black',
+                    textDecoration: 'none',
+                  }}
+                >
+                  {title}
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Stack direction="row" spacing={2}>
                   {loginSection}
                 </Stack>
               </Box>

@@ -36,11 +36,12 @@ export default function Home() {
   const [currentUser, setCurrentUser] = useState(null);
   const [favorites, setFavorites] = useState([]);
   const [tags, setTags] = useState([
-    { key: 'tag1', label: 'Venue', selected: false },
-    { key: 'tag2', label: 'Entertainment', selected: false },
-    { key: 'tag3', label: 'Catering', selected: false },
-    { key: 'tag4', label: 'Production', selected: false },
-    { key: 'tag5', label: 'Decoration', selected: false },
+    { key: 'tag1', label: 'Plumbing', selected: false },
+    { key: 'tag2', label: 'Lawncare', selected: false },
+    { key: 'tag3', label: 'Electrical', selected: false },
+    { key: 'tag4', label: 'Roofing', selected: false },
+    { key: 'tag5', label: 'Pest Control', selected: false },
+    { key: 'tag5', label: 'Cleaning', selected: false },
     // Add more tags as needed
   ]);
   const [services, setServices] = useState([]);

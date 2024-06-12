@@ -7,7 +7,7 @@ async function main() {
 
   await prisma.user.create({
     data: {
-      email: "cringe@gmail.com",
+      email: "test@gmail.com",
       password: "hello",
       displayName: "world",
       phone: "hello",
@@ -20,13 +20,13 @@ async function main() {
 
   const result = await prisma.user.findUnique({
     where: {
-      email: 'cringe@gmail.com',
+      email: 'test@gmail.com',
     },
   })
 
   await prisma.user.delete({
     where: {
-      email: 'cringe@gmail.com',
+      email: 'test@gmail.com',
     },
   })
 }
