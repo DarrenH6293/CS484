@@ -39,16 +39,16 @@ export default function Signup() {
     setRole(event.target.value);
   };
 
-  const StyledInput= styled(TextField)`
+  const StyledInput = styled(TextField)`
   input[type='number']::-webkit-inner-spin-button,
   input[type='number']::-webkit-outer-spin-button {
     display: none;
   }`;
-  
+
   const re = /^[0-9\b]+$/;
 
   const handleNumbers = (event) => {
-    event.target.value = Math.max(0, parseInt(event.target.value) ).toString().slice(0,10)
+    event.target.value = Math.max(0, parseInt(event.target.value)).toString().slice(0, 10)
     if (!re.test(event.target.value)) {
       event.preventDefault();
     }
@@ -161,7 +161,7 @@ export default function Signup() {
               required
               error={formState.role?.error}
               onChange={handleRole}>
-              <MenuItem value={'VENDOR'}>Vendor</MenuItem>
+              <MenuItem value={'VENDOR'}>Service Provider</MenuItem>
               <MenuItem value={'CUSTOMER'}>Customer</MenuItem>
             </TextField>
             <TextField

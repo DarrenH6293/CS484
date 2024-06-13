@@ -163,7 +163,7 @@ export default function Profile() {
     <>
       {currentUser && (
         <>
-          <h2 style={{ fontFamily: 'Verdana, sans-serif' }}>User Type: {currentUser.role}</h2>
+          <h2 style={{ fontFamily: 'Verdana, sans-serif', marginTop: 75 }}>User Info</h2>
           <div style={{ display: "grid", gap: "10px", marginBottom: "20px" }}>
             <div
               style={{

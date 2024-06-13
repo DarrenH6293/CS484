@@ -430,8 +430,8 @@ export default function Profile() {
         <>
           {currentUser.role === "CUSTOMER" && (
             <>
-              <h1>My Profile (Customer)</h1>
-              <h2>Bookings</h2>
+              <h1 style={{ marginTop: 75 }}>My Profile (Customer)</h1>
+              <h2>Appointments</h2>
               {bookings &&
                 bookings.map((booking, index) => (
                   <div
@@ -472,7 +472,7 @@ export default function Profile() {
           )}
           {currentUser.role === "VENDOR" && (
             <>
-              <h1>My Profile (Vendor)</h1>
+              <h1 style={{ marginTop: 75 }}>My Profile (Provider)</h1>
               <h2>My Services</h2>
               <Grid
                 container
@@ -634,7 +634,7 @@ export default function Profile() {
                   </Box>
                 </Grid>
               </Grid>
-              <h2>Bookings</h2>
+              <h2>Appointments</h2>
               {bookings &&
                 bookings.map((booking, index) => (
                   <div className="booking" key={index}>

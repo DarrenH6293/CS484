@@ -89,7 +89,7 @@ export default function Favorites() {
 
     return (
         <>
-            <h2 style={{ fontFamily: 'Verdana, sans-serif' }}>My Favorites</h2>
+            <h2 style={{ fontFamily: 'Verdana, sans-serif', marginTop: 75 }}>My Favorites</h2>
             <Grid container spacing={3} sx={{ maxWidth: "1400px", margin: "0" }}>
                 {currentUser.favorites.map((service, index) => (
                     <Grid item xs="auto" sm="auto" md={3} key={index}>

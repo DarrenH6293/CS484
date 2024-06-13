@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import StarIcon from '@mui/icons-material/Star';
-import StarBorderIcon from '@mui/icons-material/StarBorder';
+import StarIcon from "@mui/icons-material/Star";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { getSession } from "next-auth/react";
-import Divider from '@mui/material/Divider';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import { IconButton } from '@mui/material';
-
+import Divider from "@mui/material/Divider";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import { IconButton } from "@mui/material";
 
 export default function Service({ params }) {
   const [loading, setLoading] = useState(true);
@@ -32,9 +31,6 @@ export default function Service({ params }) {
   const [characterCount, setCharacterCount] = useState(0);
   const [exceedLimit, setExceedLimit] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
-  
-
-
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -67,20 +63,22 @@ export default function Service({ params }) {
           throw new Error("Failed to fetch reviews");
         }
         const data = await response.json();
-        const modifiedReviews = data.reviews.map(review => {
+        const modifiedReviews = data.reviews.map((review) => {
           const dateObject = new Date(review.date);
-          const month = dateObject.toLocaleString('default', { month: 'short' });
+          const month = dateObject.toLocaleString("default", {
+            month: "short",
+          });
           const day = dateObject.getDate();
           const hours = dateObject.getHours();
           const minutes = dateObject.getMinutes();
-          const ampm = hours >= 12 ? 'PM' : 'AM';
+          const ampm = hours >= 12 ? "PM" : "AM";
           const formattedHours = hours % 12 || 12; // Convert hours to 12-hour format
           const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes; // Add leading zero if minutes < 10
 
           return {
             ...review,
             date: `${month} ${day}`,
-            time: `${formattedHours}:${formattedMinutes} ${ampm}`
+            time: `${formattedHours}:${formattedMinutes} ${ampm}`,
           };
         });
 
@@ -113,12 +111,16 @@ export default function Service({ params }) {
         {[1, 2, 3, 4, 5].map((index) => (
           <span
             key={index}
-            style={{ cursor: 'pointer' }}
+            style={{ cursor: "pointer" }}
             onMouseEnter={() => handleMouseEnter(index)}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleClick(index)}
           >
-            {index <= (hoverRating || rating) ? <StarIcon /> : <StarBorderIcon />}
+            {index <= (hoverRating || rating) ? (
+              <StarIcon style={{ verticalAlign: "-10px", color: 'yellow', stroke: "black", strokeWidth: 1 }} />
+            ) : (
+              <StarBorderIcon style={{ verticalAlign: "-10px" }} />
+            )}
           </span>
         ))}
       </div>
@@ -130,32 +132,34 @@ export default function Service({ params }) {
       const updateFavoriteData = { id: userId, favorites: [service] };
       try {
         const response = await fetch(`/api/users`, {
-          method: 'POST',
+          method: "POST",
           body: JSON.stringify(updateFavoriteData),
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         });
 
         if (response.ok) {
           // Toggle favorite successful
-          const newFavorites = currentUser.favorites.some(fav => fav.id === service.id)
-            ? currentUser.favorites.filter(fav => fav.id !== service.id)
+          const newFavorites = currentUser.favorites.some(
+            (fav) => fav.id === service.id
+          )
+            ? currentUser.favorites.filter((fav) => fav.id !== service.id)
             : [...currentUser.favorites, service];
           const updatedUser = { ...currentUser, favorites: newFavorites };
           setCurrentUser(updatedUser);
         } else {
           // Toggle favorite failed
-          console.error('Failed to toggle favorite');
-          alert('Failed to toggle favorite');
+          console.error("Failed to toggle favorite");
+          alert("Failed to toggle favorite");
         }
       } catch (error) {
-        console.error('Error toggling favorite:', error);
-        alert('Error toggling favorite');
+        console.error("Error toggling favorite:", error);
+        alert("Error toggling favorite");
       }
     } catch (error) {
-      console.error('Error preparing favorite data:', error);
-      alert('Error preparing favorite data');
+      console.error("Error preparing favorite data:", error);
+      alert("Error preparing favorite data");
     }
   };
 
@@ -180,7 +184,6 @@ export default function Service({ params }) {
     // Reset submission status
     setIsSubmitting(false);
   };
-
 
   const handleStartTimeChange = (event) => {
     const startTime = event.target.value;
@@ -212,7 +215,11 @@ export default function Service({ params }) {
     let newBooking;
     let newNotif;
     const { date, startTime, endTime, price } = bookingInfo;
-    if (!/^\d{1,999999}$/.test(price) || Number(price) > 999999 || Number(price) < 1) {
+    if (
+      !/^\d{1,999999}$/.test(price) ||
+      Number(price) > 999999 ||
+      Number(price) < 1
+    ) {
       window.alert("Invalid Price.");
       return;
     }
@@ -261,8 +268,8 @@ export default function Service({ params }) {
           dismissed: false,
           start: new Date().toISOString(),
           bookingID: responseData.booking.id,
-          userID: service.vendorID
-        }
+          userID: service.vendorID,
+        };
 
         const responsenotif = await fetch("/api/Notifs", {
           method: "POST",
@@ -275,7 +282,6 @@ export default function Service({ params }) {
           throw new Error("Failed to add notification");
         }
         const responseDataNotif = await responsenotif.json();
-
       } catch (error) {
         console.error(error);
       }
@@ -292,7 +298,7 @@ export default function Service({ params }) {
       } else if (currentUser == null) {
         window.alert("Invalid customer email.");
         return;
-      } else if (currentUser.role == "VENDOR"){
+      } else if (currentUser.role == "VENDOR") {
         window.alert("You may not request a booking if you are a vendor.");
       }
       setIsSubmitting(true);
@@ -336,9 +342,9 @@ export default function Service({ params }) {
     const count = value.length;
     setCharacterCount(count);
     setExceedLimit(count > 3000);
-    setReview(prevReview => ({
+    setReview((prevReview) => ({
       ...prevReview,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -375,7 +381,7 @@ export default function Service({ params }) {
       const day = dateObject.getDate();
       const hours = dateObject.getHours();
       const minutes = dateObject.getMinutes();
-      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const ampm = hours >= 12 ? "PM" : "AM";
       const formattedHours = hours % 12 || 12; // Convert hours to 12-hour format
       const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes; // Add leading zero if minutes < 10
       newReview.date = `${month} ${day}`;
@@ -384,19 +390,67 @@ export default function Service({ params }) {
 
       setReview({
         stars: 0,
-        description: ""
+        description: "",
       });
     } catch (error) {
       console.error(error);
     }
   };
 
+  const modalStyles = {
+    overlay: {
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    modalContent: {
+      backgroundColor: "white",
+      padding: "20px",
+      borderRadius: "10px",
+      width: "400px",
+      boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+    },
+  };
+
+  const buttonStyles = {
+    backgroundColor: "#63D2FF",
+    fontSize: "16px",
+    color: "white",
+    borderRadius: "5px",
+    padding: "10px 20px",
+    borderColor: "black",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    cursor: "pointer",
+    transition: "background-color 0.3s ease",
+  };
+
+  const tagStyles = {
+    display: "inline-block",
+    backgroundColor: "#63D2FF",
+    padding: 10,
+    borderRadius: 15,
+    marginRight: 5,
+    color: "white",
+  };
+
   const calculateOverallRating = () => {
-    const serviceReviews = reviews.filter(review => review.serviceID === service.id);
+    const serviceReviews = reviews.filter(
+      (review) => review.serviceID === service.id
+    );
 
     if (serviceReviews.length === 0) return 0;
 
-    const totalStars = serviceReviews.reduce((acc, curr) => acc + curr.stars, 0);
+    const totalStars = serviceReviews.reduce(
+      (acc, curr) => acc + curr.stars,
+      0
+    );
 
     return totalStars / serviceReviews.length;
   };
@@ -412,89 +466,217 @@ export default function Service({ params }) {
   return (
     <div>
       <div style={{ display: "flex", alignItems: "flex-start" }}>
-        <div style={{ flex: "1", marginRight: "20px", marginTop: 30}}>
-          <h1 style={{ fontFamily: 'Verdana, sans-serif'}}>{service.name} {currentUser && (
-            <IconButton
-              aria-label={`favorite ${service.name}`}
-              onClick={() => toggleFavorite(currentUser.id, service)}
-              sx={{ color: currentUser.favorites.some(fav => fav.id === service.id) ? 'red' : 'black' }}
+        <div style={{ flex: "1", marginRight: "20px", marginTop: 30 }}>
+          <div
+            style={{
+              flex: "1",
+              marginTop: 30,
+              display: "flex",
+              alignItems: "center",
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+          >
+            <h1
+              style={{
+                fontFamily: "Verdana, sans-serif",
+                textDecoration: "underline",
+              }}
             >
-              {currentUser.favorites.some(fav => fav.id === service.id) ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-            </IconButton>
-          )}</h1>
-          {/* Display service image */}
-          <div style={{ maxWidth: "400px" }}>
-            {service.image ? (
-              <img
-                src={`/images/vendor/${service.id}.png`}
-                alt={service.name}
-                style={{
-                  width: "100%",
-                  height: "auto",
-                  objectFit: "contain",
-                  objectPosition: "left",
-                  marginBottom: "8px",
-                  borderRadius: '10px'
+              {service.name}
+            </h1>{" "}
+            {currentUser && (
+              <IconButton
+                aria-label={`favorite ${service.name}`}
+                onClick={() => toggleFavorite(currentUser.id, service)}
+                sx={{
+                  color: currentUser.favorites.some(
+                    (fav) => fav.id === service.id
+                  )
+                    ? "red"
+                    : "black",
                 }}
-              />
-            ) : (
+              >
+                {currentUser.favorites.some((fav) => fav.id === service.id) ? (
+                  <FavoriteIcon sx={{ fontSize: "2rem" }} />
+                ) : (
+                  <FavoriteBorderIcon sx={{ fontSize: "2rem" }} />
+                )}
+              </IconButton>
+            )}
+          </div>
+          {/* Display service image */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              gap: "10px",
+              height: 400,
+            }}
+          >
+            <div>
+              {service.image ? (
+                <img
+                  src={`/images/vendor/${service.id}.png`}
+                  alt={service.name}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "fill",
+                    objectPosition: "left",
+                    marginBottom: "8px",
+                    borderRadius: "10px",
+                  }}
+                />
+              ) : (
+                <img
+                  src="/images/placeholder.png"
+                  alt="Placeholder"
+                  style={{
+                    width: "200%",
+                    height: "100%",
+                    objectFit: "fill",
+                    objectPosition: "left",
+                    marginBottom: "8px",
+                    borderRadius: "10px",
+                  }}
+                />
+              )}
+            </div>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+            >
               <img
                 src="/images/placeholder.png"
-                alt="Placeholder"
+                alt="Placeholder 1"
                 style={{
                   width: "100%",
-                  height: "auto",
-                  objectFit: "contain",
-                  objectPosition: "left",
-                  marginBottom: "8px",
-                  borderRadius: '10px'
+                  height: "50%",
+                  objectFit: "fill",
+                  objectPosition: "right",
+                  borderRadius: "10px",
                 }}
               />
-            )}
+              <img
+                src="/images/placeholder.png"
+                alt="Placeholder 2"
+                style={{
+                  width: "100%",
+                  height: "50%",
+                  objectFit: "fill",
+                  objectPosition: "right",
+                  borderRadius: "10px",
+                }}
+              />
+            </div>
           </div>
           <br />
         </div>
-        <div style={{ flex: "1", border: "1px solid #ccc", marginTop: "90px", borderRadius: "5px", padding: "1px", marginLeft: "20px", display: "flex" }}>
+        <div
+          style={{
+            flex: "1",
+            border: "1px solid #ccc",
+            marginTop: "150px",
+            borderRadius: "5px",
+            padding: "1px",
+            marginLeft: "20px",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
           <div style={{ flex: "1", marginRight: "10px" }}>
             <div style={{ marginBottom: "10px", marginLeft: "10px" }}>
-              <h2 style={{ fontFamily: 'Verdana, sans-serif'}}>About This Service</h2>
-              <p style={{ fontFamily: 'Verdana, sans-serif', wordWrap: 'break-word' }}>{service.description}</p>
+              <h2
+                style={{
+                  fontFamily: "Verdana, sans-serif",
+                  textDecoration: "underline",
+                }}
+              >
+                About This Service
+              </h2>
+              <p
+                style={{
+                  fontFamily: "Verdana, sans-serif",
+                  wordWrap: "break-word",
+                }}
+              >
+                {service.description}
+              </p>
             </div>
             <div>
-              <Divider orientation="horizontal" flexItem style={{ marginLeft: "10px" }} />
-              <h2 style={{ fontFamily: 'Verdana, sans-serif', marginLeft: "10px" }}>Service Information</h2>
-              <p style={{ fontFamily: 'Verdana, sans-serif', marginLeft: "10px", wordWrap: 'break-word' }}>
-                Type: {service.type.name}<br />
-                Price: ${service.minPrice} - ${service.maxPrice}<br />
+              <Divider
+                orientation="horizontal"
+                flexItem
+                style={{ marginLeft: "10px" }}
+              />
+              <h2
+                style={{
+                  fontFamily: "Verdana, sans-serif",
+                  marginLeft: "10px",
+                  textDecoration: "underline",
+                }}
+              >
+                Service Information
+              </h2>
+              <p
+                style={{
+                  fontFamily: "Verdana, sans-serif",
+                  marginLeft: "10px",
+                  wordWrap: "break-word",
+                }}
+              >
+                Type: {service.type.name}
+                <br />
+                Price: ${service.minPrice} - ${service.maxPrice}
+                <br />
                 Location: {service.address}
               </p>
             </div>
           </div>
-          <Divider orientation="vertical" flexItem />
-          <div style={{ flex: "1" }}>
-            <div style={{ marginBottom: "10px", marginLeft: "10px" }}>
-              <h2 style={{ fontFamily: 'Verdana, sans-serif'}}>Vendor Information</h2>
-              <p style={{ fontFamily: 'Verdana, sans-serif', wordWrap: 'break-word' }}>
-                Vendor: {service.vendor.displayName}<br />
-                Phone: {service.vendor.phone}<br />
-                Email: {service.vendor.email}
-              </p>
-            </div>
-          </div>
+          <button style={buttonStyles} onClick={handleMakeBookingClick}>
+            Request Appointment
+          </button>
         </div>
       </div>
-      <button onClick={handleMakeBookingClick}>Request Booking</button>
+      <div
+        style={{
+          flex: "1",
+          border: "1px solid #ccc",
+          borderRadius: "5px",
+          padding: "5px",
+          display: "flex",
+          flexDirection: "column",
+          width: "49%",
+        }}
+      >
+        <span style={{ fontSize: 25 }}>Tags</span>
+        <Divider
+          orientation="horizontal"
+          flexItem
+          style={{
+            marginLeft: "10px",
+            marginTop: "20px",
+            marginBottom: "20px",
+          }}
+        />
+        <div style={{ flex: "1", display: "flex", flexDirection: "row" }}>
+          <span style={tagStyles}>No Tags Available</span>
+        </div>
+      </div>
 
       {/* Modal */}
       {isModalOpen && (
-        <div>
-          <div className="modal-content">
+        <div style={modalStyles.overlay}>
+          <div style={modalStyles.modalContent}>
+            <h2 style={{ marginTop: -10 }}>Appointment Information</h2>
             <p>Date:</p>
             <input
               type="date"
               name="date"
               value={bookingInfo.date}
-              onChange={(e) => setBookingInfo({ ...bookingInfo, date: e.target.value })}
+              onChange={(e) =>
+                setBookingInfo({ ...bookingInfo, date: e.target.value })
+              }
             />
 
             <p>Start Time:</p>
@@ -518,7 +700,9 @@ export default function Service({ params }) {
               type="number"
               name="price"
               value={bookingInfo.price}
-              onChange={(e) => setBookingInfo({ ...bookingInfo, price: e.target.value })}
+              onChange={(e) =>
+                setBookingInfo({ ...bookingInfo, price: e.target.value })
+              }
             />
 
             {!isStartTimeValid && (
@@ -527,31 +711,46 @@ export default function Service({ params }) {
               </p>
             )}
 
-            {isSubmitting ? (
-              <p>Submitting booking...</p>
-            ) : (
-              <button onClick={handleSubmitBooking}>Submit Booking</button>
-            )}
-            <button onClick={closeModal}>Close</button>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
+              <button style={buttonStyles} onClick={closeModal}>Close</button>
+              {isSubmitting ? (
+                <p>Submitting booking...</p>
+              ) : (
+                <button style={buttonStyles} onClick={handleSubmitBooking}>Submit</button>
+              )}
+            </div>
           </div>
         </div>
       )}
 
+
       {/* Area for Reviews */}
       <div style={{ marginTop: "20px" }}>
-        <h2 style={{ marginBottom: "10px" }}>Reviews: {calculateOverallRating().toFixed(1)} <StarIcon style={{ verticalAlign: "-3.5px" }} /></h2>
-        <div style={{ border: "1px solid #ccc", borderRadius: "5px", padding: "10px" }}>
+        <h2 style={{ marginBottom: "10px" }}>
+          Reviews: {calculateOverallRating().toFixed(1)}{" "}
+          <StarIcon style={{ verticalAlign: "-3.5px", color: 'yellow', stroke: "black", strokeWidth: 1 }} />
+        </h2>
+        <div
+          style={{
+            border: "1px solid #ccc",
+            borderRadius: "5px",
+            padding: "10px",
+          }}
+        >
           {currentUser && (
             <div>
-              <h2>Add Review</h2>
-              <p>Rating:</p>
-              <StarRating
-                rating={review.stars}
-                onRatingChange={stars => setReview(prevReview => ({ ...prevReview, stars }))}
-              />
-              <p>Review:</p>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <h2 style={{ marginRight: '10px' }}>Add Review: </h2>
+                <StarRating
+                  rating={review.stars}
+                  onRatingChange={(stars) =>
+                    setReview((prevReview) => ({ ...prevReview, stars }))
+                  }
+                />
+              </div>
               <textarea
                 style={{ width: "100%", height: "200px" }}
+                placeholder="Write your review here..."
                 name="description"
                 value={review.description}
                 onChange={handleReviewChange}
@@ -560,36 +759,66 @@ export default function Service({ params }) {
                 <p>Submitting review...</p>
               ) : (
                 <div style={{ display: "flex", alignItems: "center" }}>
-                  <button onClick={handleSubmitReview} style={{ marginRight: "10px" }}>Submit Review</button>
-                  <p style={{ fontSize: "10px" }}>{characterCount} / 3000 characters left</p>
-                  {exceedLimit && <p style={{ color: "red", marginLeft: "10px", fontSize: "10px" }}>Character limit exceeded!</p>}
+                  <button
+                    onClick={handleSubmitReview}
+                    style={buttonStyles}
+                  >
+                    <span>Submit Review</span>
+                  </button>
+                  <p style={{ paddingLeft: 20, fontSize: "10px" }}>
+                    {characterCount} / 3000 characters left
+                  </p>
+                  {exceedLimit && (
+                    <p
+                      style={{
+                        color: "red",
+                        marginLeft: "10px",
+                        fontSize: "10px",
+                      }}
+                    >
+                      Character limit exceeded!
+                    </p>
+                  )}
                 </div>
               )}
-              <Divider sx={{ marginTop: '20px' }} />
-              <Divider sx={{ marginTop: '10px' }} />
+              <Divider sx={{ marginTop: "20px" }} />
+              <Divider sx={{ marginTop: "10px" }} />
             </div>
           )}
 
-          {reviews && reviews
-            .filter(review => review.serviceID === service.id)
-            .map((review, index) => (
-              <div key={index}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <div>
-                    <p><strong>User:</strong> {review.author.displayName}</p>
-                    <p></p>
+          {reviews &&
+            reviews
+              .filter((review) => review.serviceID === service.id)
+              .map((review, index) => (
+                <div key={index}>
+                  <div
+                    style={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <div>
+                      <p>
+                        <strong>User:</strong> {review.author.displayName}
+                      </p>
+                      <p></p>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <p>
+                        <strong>
+                          {review.stars}{" "}
+                          <StarIcon style={{ verticalAlign: "-5.5px", color: 'yellow', stroke: "black", strokeWidth: 1 }} /> -{" "}
+                        </strong>{" "}
+                        {review.date}, {review.time}
+                      </p>
+                    </div>
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <p><strong>{review.stars} <StarIcon style={{ verticalAlign: "-5.5px" }} /> - </strong> {review.date}, {review.time}</p>
-                  </div>
+                  <p style={{ wordWrap: "break-word" }}>
+                    <strong>Review:</strong> {review.description}
+                  </p>
+                  <Divider sx={{ marginTop: "10px" }} />
                 </div>
-                <p style={{ wordWrap: 'break-word' }}><strong>Review:</strong> {review.description}</p>
-                <Divider sx={{ marginTop: '10px' }} />
-              </div>
-            ))}
-          {reviews && reviews.filter(review => review.serviceID === service.id).length === 0 && (
-            <p>This service has no reviews so far.</p>
-          )}
+              ))}
+          {reviews &&
+            reviews.filter((review) => review.serviceID === service.id)
+              .length === 0 && <p>This service has no reviews so far.</p>}
         </div>
       </div>
     </div>
