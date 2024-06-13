@@ -1,5 +1,3 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
 ## Getting Started
 
 First, get a database running. You will need Docker installed on your machine. 
@@ -43,12 +41,12 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 | Email              | Password | Role |
 | :---------------- | :------: | ----: |
-| bobjoe@mail.com   |   bobjoe   | Vendor |
+| bobjoe@mail.com   |   bobjoe   | Service Provider |
 | janedoe@mail.com   |   janedoe   | Customer |
-| abby@mail.com   |  abby   | Vendor |
-| hankgreen@mail.com |  hankgreen   | Vendor |
-| carljr@mail.com   |  carljr   | Vendor |
-| benten@mail.com |  benten   | Vendor |
+| abby@mail.com   |  abby   | Service Provider |
+| hankgreen@mail.com |  hankgreen   | Service Provider |
+| carljr@mail.com   |  carljr   | Service Provider |
+| benten@mail.com |  benten   | Service Provider |
 
 
 You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
@@ -66,20 +64,10 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 - [Prisma Documentation](https://www.prisma.io/docs/getting-started) - the docs for the ORM we are using. 
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
-
 ## Look at your database
 
 ```bash
 npx prisma studio
 ```
-
-## Requirements Currently Finished
-
-2, 5, 6, 7, 14, 15, 19, 21, 23
 
 
