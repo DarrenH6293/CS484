@@ -51,6 +51,7 @@ export default function Home() {
   const [maxPrice, setMaxPrice] = useState(1000000);
   const [searchInput, setSearchInput] = useState("")
   const [city, setCity] = useState('')
+  const [rating, setRating] = useState('')
   const [reviews, setReviews] = useState([]);
 
 
@@ -148,6 +149,11 @@ export default function Home() {
         let c = service.address.split(',')[1].toLowerCase();
         return c.includes(city.toLowerCase())
       })
+    }
+    if (rating !== null) {
+      filteredServices = filteredServices.filter(service =>
+        calculateOverallRating(service) >= rating
+      );
     }
     return filteredServices;
   };
@@ -270,6 +276,7 @@ export default function Home() {
     setMinPrice(0);
     setMaxPrice(10000);
     setCity('');
+    setRating('');
   };
 
   const calculateOverallRating = (service) => {
@@ -413,6 +420,22 @@ export default function Home() {
               fullWidth
               name="city"
               onChange={(e) => setCity(e.target.value)}
+            >
+            </TextField>
+          </FormControl>
+
+          {/* Divider */}
+          <Divider sx={{ my: 2 }} />
+
+          {/* Rating */}
+          <FormControl fullWidth sx={{ my: 1 }}>
+            <p>Rating</p>
+            <TextField type='number'
+              label='Rating'
+              value={rating}
+              fullWidth
+              name="rating"
+              onChange={(e) => setRating(e.target.value)}
             >
             </TextField>
           </FormControl>
