@@ -526,6 +526,7 @@ export default function Service({ params }) {
                     objectPosition: "left",
                     marginBottom: "8px",
                     borderRadius: "10px",
+                    border: "2px solid black"
                   }}
                 />
               ) : (
@@ -555,6 +556,7 @@ export default function Service({ params }) {
                   objectFit: "fill",
                   objectPosition: "right",
                   borderRadius: "10px",
+                  border: "2px solid black"
                 }}
               />
               <img
@@ -566,6 +568,7 @@ export default function Service({ params }) {
                   objectFit: "fill",
                   objectPosition: "right",
                   borderRadius: "10px",
+                  border: "2px solid black"
                 }}
               />
             </div>
@@ -749,7 +752,7 @@ export default function Service({ params }) {
                 />
               </div>
               <textarea
-                style={{ width: "100%", height: "200px" }}
+                style={{ width: "100%", height: "200px", fontSize: 18 }}
                 placeholder="Write your review here..."
                 name="description"
                 value={review.description}
@@ -794,13 +797,13 @@ export default function Service({ params }) {
                   <div
                     style={{ display: "flex", justifyContent: "space-between" }}
                   >
-                    <div>
+                    <div style={{ fontSize: 18 }}>
                       <p>
                         <strong>User:</strong> {review.author.displayName}
                       </p>
                       <p></p>
                     </div>
-                    <div style={{ textAlign: "right" }}>
+                    <div style={{ textAlign: "right", fontSize: 18 }}>
                       <p>
                         <strong>
                           {review.stars}{" "}
@@ -810,7 +813,7 @@ export default function Service({ params }) {
                       </p>
                     </div>
                   </div>
-                  <p style={{ wordWrap: "break-word" }}>
+                  <p style={{ wordWrap: "break-word", fontSize: 18, marginTop: -5 }}>
                     <strong>Review:</strong> {review.description}
                   </p>
                   <Divider sx={{ marginTop: "10px" }} />

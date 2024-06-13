@@ -459,7 +459,8 @@ export default function Home() {
                   objectFit: "fit",
                   objectPosition: "center",
                   marginBottom: "8px",
-                  borderRadius: '10px'
+                  borderRadius: '10px',
+                  border: "2px solid black"
                 }}
               />
             ) : (
