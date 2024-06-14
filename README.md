@@ -1,3 +1,13 @@
+## Project Overview
+
+A website designed to connect homeowners with reliable home service professionals. 
+It addresses the common challenges homeowners face when trying to find trustworthy and skilled professionals for jobs around the house.
+
+
+## Project Structure
+
+Web application hosted locally with Docker, made with Next.js and a PostgreSQL Prisma database.
+
 ## Getting Started
 
 First, get a database running. You will need Docker installed on your machine. 
