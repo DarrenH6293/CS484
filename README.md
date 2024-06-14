@@ -1,3 +1,7 @@
+## Project Structure
+
+Web application hosted locally with Docker, made with Next.js and a PostgreSQL Prisma database.
+
 ## Getting Started
 
 First, get a database running. You will need Docker installed on your machine. 
