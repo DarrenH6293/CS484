@@ -1,3 +1,7 @@
+## VIDEO DEMO
+
+Download the CS484_Demo.mp4 from the repository for the video demo.
+
 ## Project Overview
 
 A website designed to connect homeowners with reliable home service professionals. 
